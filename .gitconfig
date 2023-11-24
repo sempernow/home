@@ -1,7 +1,6 @@
 [core]
 	autocrlf = false
 	safecrlf = false
-	#editor = \"C:\\Users\\X1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin\\code\" --wait
 	editor = vim
 	pager  = less -x1,3
 	excludesfile = ~/.gitignore_global

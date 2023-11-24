@@ -1,15 +1,11 @@
 # .bash_functions
 
 # End here if functions already exist (run once)
-[[ $(type -t now) ]] && return 
+#[[ "$(type -t now)" ]] && return 
 
 set -a  # EXPORT ALL ...
 
-# exit-code conventions for this library
-#   0/1  normal [success/fail per context]
-#   99   bad-param or bad-result [errMSG]
-#   86   fatal|out-of-band
-#   77   under develpment 
+[[ "$_PID_1xSHELL" ]] || _PID_1xSHELL=$( ps |grep 'bash' |sort -k 7 |awk '{print $1;}' |head -n 1 )
 
 ######
 # Date
@@ -18,38 +14,38 @@ today(){
     # YYY-MM-DD
     t="$(date +%F)";echo "$t"
     #[[ ! "$1" ]] && { REQUIREs putclip ; putclip "$t"; } 
-    [[ ! "$1" ]] && { [[ $(type -t putclip) ]] && putclip "$t"; } 
+    #[[ ! "$1" ]] && { [[ $(type -t putclip) ]] && putclip "$t"; } 
 }
 now(){ 
     # HH.mm.ss
     t="$(date +%H.%M.%S)";echo "$t"
-    [[ ! "$1" ]] && { [[ $(type -t putclip) ]] && putclip "$t"; } 
+    #[[ ! "$1" ]] && { [[ $(type -t putclip) ]] && putclip "$t"; } 
 }
 todaynow(){ 
     # YYY-MM-DD_HH.mm.ss
     t="$(date +%F_%H.%M.%S)";echo "$t"
-    [[ ! "$1" ]] && { [[ $(type -t putclip) ]] && putclip "$t"; } 
+    #[[ ! "$1" ]] && { [[ $(type -t putclip) ]] && putclip "$t"; } 
 }
 utc(){ 
     # YYY-MM-DDTHH.mm.ss
     t="$(date '+%Y-%m-%dT%H:%M:%S')";echo "$t"
-    [[ ! "$1" ]] && { [[ $(type -t putclip) ]] && putclip "$t"; } 
+    #[[ ! "$1" ]] && { [[ $(type -t putclip) ]] && putclip "$t"; } 
 }
 utcz(){ 
     # YYY-MM-DDTHH.mm.ssZ
     t="$(date -u '+%Y-%m-%dT%H:%M:%SZ')";echo "$t"
-    [[ ! "$1" ]] && { [[ $(type -t putclip) ]] && putclip "$t"; } 
+    #[[ ! "$1" ]] && { [[ $(type -t putclip) ]] && putclip "$t"; } 
 }
 alias gmt=utcz;alias zulu=utcz
 iso(){
     # YYY-MM-DDTHH.mm.ss+/-HH:mm
     t="$(date --iso-8601=seconds)";echo "$t"
-    [[ ! "$1" ]] && { [[ $(type -t putclip) ]] && putclip "$t"; } 
+    #[[ ! "$1" ]] && { [[ $(type -t putclip) ]] && putclip "$t"; } 
 }
 isoz(){
     # YYY-MM-DDTHH.mm.ss+00:00
     t="$(date -u --iso-8601=seconds)";echo "$t"
-    [[ ! "$1" ]] && { [[ $(type -t putclip) ]] && putclip "$t"; } 
+    #[[ ! "$1" ]] && { [[ $(type -t putclip) ]] && putclip "$t"; } 
 }
 
 ####
@@ -142,7 +138,25 @@ _hash() {
         [[ ! "$algo" ]] && errMSG "$FUNCNAME FAIL @ null 'algo'"
     fi
 }
-woff2base64() { [[ $(type -t base64) && -f "$@" ]] && base64 -w 0 "$@"; }
+woff2base64() { [[ "$(type -t base64)" && -f "$@" ]] && base64 -w 0 "$@"; }
+
+#####
+# ssh
+
+alias fpr='ssh-keygen -E md5 -lvf'
+alias fprs='ssh-keygen -lvf'
+hostfprs() { 
+    # Scan host and show fingerprints of its keys to mitigate MITM attacks.
+    # Use against host's claimed fingerprint on ssh-copy-id or other 1st connect.
+    [[ "$1" ]] && {
+        ssh-keyscan $1 2>/dev/null |ssh-keygen -lf -
+    } || {
+        printf "\n%s\n" 'Usage:'
+        echo "$FUNCNAME \$host (FQDN or IP address)"
+    }
+    printf "\n%s\n" 'Push key to host:'
+    echo 'ssh-copy-id -i $keypath $ssh_user@$host'
+}
 
 ######
 # Meta
@@ -151,17 +165,17 @@ colors() {
     # Each is a background color and contrasting text color.
     # Usage: colors;printf "\n %s\n" "$green MESSAGE $norm"
     [[ "$TERM" ]] || return 99
-    norm="$( tput sgr0 )"                       # reset
+    normal="$( tput sgr0 )"                       # reset
     red="$(    tput setab 1 ; tput setaf 7 )"
     yellow="$( tput setab 3 ; tput setaf 0 )"   # blk foreground
     green="$(  tput setab 2 ; tput setaf 0 )"   # blk foreground
     greenw="$( tput setab 2 ; tput setaf 7 )"   # wht foreground
     blue="$(   tput setab 4 ; tput setaf 7 )"
-    grey="$(   tput setab 7 ; tput setaf 0 )" ; alias gray=grey
+    gray="$(   tput setab 7 ; tput setaf 0 )" ; alias grey=gray
     aqua="$(   tput setab 6 ; tput setaf 7 )"
     aqux="$(   tput setab 6 ; tput setaf 6 )"   # hidden text
-    zzz="$norm"  
-    normal="$norm" 
+    zzz="$normal"  
+    norm="$normal" 
     
 }
 errMSG() { 
@@ -181,7 +195,7 @@ REQUIREs(){
     do  # exist-test ; append flag on fail
         [[ "$( type -t $func )" ]] || flag="${flag}'${func}', "
     done
-    [[ $flag ]] && { # inform of calling-function and non-existent functions
+    [[ "$flag" ]] && { # inform of calling-function and non-existent functions
         flag="${flag%,*}" ; errMSG "'${FUNCNAME[1]}' REQUIREs function[s] that do NOT EXIST ..."
         printf '\n %s\n' "$flag"
         # return|exit [86] on fail per @ 1x-bash or not
@@ -191,7 +205,7 @@ REQUIREs(){
     return 0
 }
 putclip() { 
-    # PARAMs: STR
+    # ARGs: STR
     # $@ => clipboard [erases it on null input]
     if [[ ! "$_CLIPBOARD" ]] # set clipboard per OS, once per Env.
     then 
@@ -224,23 +238,31 @@ x(){
     }
     exit > /dev/null 2>&1
 }
-_PID_1xSHELL=$( ps |grep 'bash' |sort -k 7 |awk '{print $1;}' |head -n 1 )
 shlvl(){ 
     # ARGs: [{msg}]
     # Show shell level [and message]
     colors; [[ "$@" ]] && _msg=": $@" || unset _msg
     [[ "${FUNCNAME[1]}" == 'x' ]] && _shlvl=$(( $SHLVL - 1 )) || _shlvl=$SHLVL
-    [[ "$_shlvl" == "1" && "$PPID" == "$_PID_1xSHELL" ]] && { printf "\n %s\n" "$red $(( $_shlvl ))x ${SHELL##*/} $norm $_msg" ; } || { printf "\n %s\n" "$(( $_shlvl ))x ${SHELL##*/} $_msg" ; }
+    [[ "$_shlvl" == "1" ]] && [[ "$PPID" == "$_PID_1xSHELL" ]] && { printf "\n %s\n" "$red $(( $_shlvl ))x ${SHELL##*/} $norm $_msg" ; } || { printf "\n %s\n" "$(( $_shlvl ))x ${SHELL##*/} $_msg" ; }
 }
 
 #####
 # Git
 
-[[ $(type -t git ) ]] && {
+[[ "$(type -t git)" ]] && {
+
+    git_bash_completion=/usr/share/bash-completion/completions/git
+    [[ -f $git_bash_completion ]] && source $git_bash_completion
+
     alias gcfg='git config -l'
     ga(){ git add . ; git status; } 
     gb(){ git branch --all;echo;git remote -v; } 
-    gbd(){ [[ "$@" ]] && git branch -D "$@"; }
+    gbd(){ 
+        [[ "$1" ]] || return 90
+        [[ "$(git branch --all |grep $1)" ]] || return 91
+        git branch -D $1                # Local
+        git push origin --delete $1     # Remote
+    }
     gc(){ # commit -m [MSG]
         [[ -d ./.git ]] || git init
         [[ "$@" ]] && _m="$@" || { REQUIREs newest; _m="$( newest )"; _m="${_m##*/} @ $(date -u '+%Y-%m-%dT%H.%M.%SZ')"; }  
@@ -288,7 +310,7 @@ shlvl(){
 ########
 # Docker
 
-[[ $(type -t docker ) ]] && {
+[[ "$(type -t docker)" ]] && {
     alias dc='docker-compose'
     ## docker image
     alias di='docker image ls'
@@ -302,8 +324,6 @@ shlvl(){
         }
     }
     ## docker container 
-    dex(){ docker exec -it ${1:-bbox} sh; }
-    alias dex='docker exec -it'
     alias dps='docker container ps --format "table {{.ID}}  {{.Names}}\t{{.Image}}\t{{.Ports}}\t{{.Status}}"'
     alias dpsa='docker ps -a --format "table {{.ID}}  {{.Names}}\t{{.Image}}\t{{.Status}}\t{{.Ports}}"'
     dstart(){ [[ "$@" ]] && docker container ls -a |grep "$@" |gawk 'NR == 1 {print $1}' |xargs docker container start; }
@@ -320,13 +340,13 @@ shlvl(){
     dvp(){ docker volume prune -f; }
     ## docker exec
     dex(){
-        [[ $1 ]] && {
+        [[ "$1" ]] && {
             docker exec -it $(docker container ls --filter name=$1 -q) ${2:-sh} $3 $4 $5 $6 $7 $8 $9
         }
     }
     ## docker stats
     dstats(){ 
-        [[ $1 == '' ]] && _no_stream='--no-stream' || _no_stream=''
+        [[ "$1" == '' ]] && _no_stream='--no-stream' || _no_stream=''
         docker stats $_no_stream --format 'table {{.ID}}  {{.Name}}\t{{.CPUPerc}}  {{.MemUsage}}\t{{.MemPerc}}  {{.NetIO}}\t{{.BlockIO}}\t{{.PIDs}}'
     }
 }
@@ -334,7 +354,7 @@ shlvl(){
 #####
 # K8s
 
-[[ $(type -t kubectl ) ]] && {
+[[ "$(type -t kubectl)" ]] && {
 
     all='deploy,sts,rs,pod,ep,svc,ingress,cm,secret,pvc,pv'
 
@@ -371,9 +391,9 @@ shlvl(){
     # Get/Set cluster's default StorageClass 
     # (minikube reverts to "standard" per `minikube start`)
     ksc(){
-        [[ $1 ]] && {
+        [[ "$1" ]] && {
             default=$(kubectl get sc |grep default |awk '{print $1}')
-            [[ $default ]] && { 
+            [[ "$default" ]] && { 
                 ## If current default exists, then unset it
                 kubectl patch sc $default -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"false"}}}'
             }
@@ -394,7 +414,7 @@ shlvl(){
             kube-proxy
         '
         _ps(){
-            [[ $1 ]] || exit 1
+            [[ "$1" ]] || exit 1
             echo @ $1 
             ps aux |grep -- $1 |tr ' ' '\n' \
                 |grep -- -- |grep -v color |grep -v grep
@@ -407,7 +427,8 @@ shlvl(){
 set +a  # END export 
 
 ## End here if not interactive
-[[ "$-" != *i* ]] && return
-[[ -n "$PS1" ]] || return
+# [[ "$-" != *i* ]] && return
+[[ -z "$PS1" ]] && return 0
 
-[[ $BASH_SOURCE ]] && echo "@ ${BASH_SOURCE##*/}"
+#[[ "$BASH_SOURCE" ]] && echo "@ ${BASH_SOURCE##*/}"
+[[ "$BASH_SOURCE" ]] && echo "@ ${BASH_SOURCE}"
