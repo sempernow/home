@@ -1,7 +1,12 @@
-# .bashrc_win
+# source /etc/profile.d/win.sh
+##############################################
+# Configure bash shell @ WSL|Cygwin|GitBash
+##############################################
+[[ "$isBashWinSourced" ]] && return
+isBashWinSourced=1
 
-# End here if functions already exist (run once)
-#[[ $(type -f win2posix) ]] && return 
+# End here lest environment has WSL(2)
+# [[ "$isWindows" ]] || return
 
 # WSL : Bash on Windows improperly sets `umask` to 0000; should be 0022.
 # https://www.turek.dev/post/fix-wsl-file-permissions/ 
@@ -26,7 +31,7 @@ unset _USERPROFILE
 } || {
     [[ "$( type -t cmd.exe )" ]] && {
         [[ "$USERNAME" == 'root' ]] && USERPROFILE=/ || USERPROFILE="/$( echo "$( cmd.exe /c "set USERPROFILE" )" |awk -F= '{print $2}' |sed 's/\\/\//g' |sed 's/://g' |sed 's/^C/c/g' )"
-        [[ "$USERPROFILE" ]] && { _USERPROFILE="$USERPROFILE"; } || { echo " FAILed @ USERPROFILE"; }
+        [[ "$USERPROFILE" ]] && _USERPROFILE="$USERPROFILE"
     }
 }
 _HOME="$HOME" # set per %HOME% for Cygwin/Git-for-Windows/MINGW64/MSYS
@@ -78,7 +83,7 @@ _ETC_ARCHIVES_FOLDER="${_HOME}/etc.archives"
     true
 } || { 
 # @ linux-gnu
-
+    
     # @ brew 
     [[ "${PATH/linuxbrew/}" == "$PATH" ]] && {
         p1="/home/linuxbrew/.linuxbrew/bin"
@@ -110,7 +115,8 @@ _ETC_ARCHIVES_FOLDER="${_HOME}/etc.archives"
     [[ "$GOROOT" ]] || GOROOT='/usr/local/go'
     # BUG :: hidden chars in USERPROFILE & _USERPROFILE
     for dir in "${_HOME}/go" ~/go '/go' "/c/Users/${USER^^}/go" "/c/Users/X1/go" "${USERPROFILE}/go" 
-        do [[ -d "$dir" ]] && GOPATH="$dir"
+    do 
+        [[ -d "$dir" ]] && GOPATH="$dir"
     done; 
     [[ -d "$GOROOT" && -d "$GOPATH" ]] && {
         [[ -d "$GOROOT/bin" ]] && { GOBIN="$GOROOT/bin"; PATH="$PATH:$GOBIN"; }
@@ -131,13 +137,13 @@ _ETC_ARCHIVES_FOLDER="${_HOME}/etc.archives"
 
 _CYGDRIVE="$_PREFIX" # used @ local bash scripts, e.g., cygpath, ffmpeg
 
-[[ $_STAGING_FOLDER ]] && {
+[[ "$_STAGING_FOLDER" ]] && {
     _REFs_STAGING="${_STAGING_FOLDER}/etc/REFs"
     _PRJs_STAGING="${_STAGING_FOLDER}/etc/PRJs"
 }
 
 # prepend scripts path to PATH, if not already in PATH
-[[ "${PATH/$_SCRIPTS_FOLDER/}" == "$PATH" ]] && PATH="$PATH:$_SCRIPTS_FOLDER"
+[[ "$_SCRIPTS_FOLDER" ]] && [[ "${PATH/$_SCRIPTS_FOLDER/}" == "$PATH" ]] && PATH="$PATH:$_SCRIPTS_FOLDER"
 
 # Set prompt vars :: PS1 ref @ https://ss64.com/bash/syntax-prompt.html
 [[ "$_OS" ]] || _OS="$WSL_DISTRO_NAME" 
@@ -150,19 +156,6 @@ _CYGDRIVE="$_PREFIX" # used @ local bash scripts, e.g., cygpath, ffmpeg
 # make @ Git-for-Windows 
 [[ "$OSTYPE" == 'msys' ]] && alias make=/c/ProgramData/chocolatey/bin/make.exe
 
-# @ WSL 2 : Host IP is NOT localhost : some apps fail if DISPLAY not reset:
-## STDOUT of this wsl.exe statement includes a null byte. (Thank Microsoft.) 
-## This named-pipe scheme handles that, else warning text persists (@ STDOUT) regardless.
-set +o posix          # if syntax not POSIX, abide other
-mkfifo p1 
-wsl.exe -l -v >p1 &
-[[ $(cat <p1 |tr -d '\000' |grep ${_OS} |awk '{print $NF}' |grep 2) ]] && {
-    # Reset only at WSL 2 terminal
-    export DISPLAY=$(grep nameserver /etc/resolv.conf |awk '{print $2}'):0.0
-    #export DISPLAY='172.31.16.1:0.0'
-}
-rm p1
-
 _ARCHIVE_DOT_FILES=1   # set to archive dot file
 is_hex32() { 
     # PARAMs: STR
@@ -173,7 +166,6 @@ is_hex32() {
 
     return 1
 }
-
 isinteger() { 
     # PARAMs: STR 
     # stdout: $1 if int, else nul
@@ -207,12 +199,12 @@ isDOS() {
     # ARGs: FILE-PATH
     # stdout: '1' if DOS, null if UNIX
     # companion script: ~/.bin/dos2unix
-    REQUIREs isASCII dos2unix
+    REQUIREs isASCII #dos2unix
     [[ -f "$@" ]] && {
-        [[ $( isASCII "$@" ) ]] || return 0
+        [[ "$( isASCII "$@" )" ]] || return 0
         #dos2unix < "$@" |cmp -s - "$@"
         #(( $? )) && echo '1' || true
-        [[ $( file "$@" |grep 'CRLF' ) ]] && echo '1' || true 
+        [[ "$( file "$@" |grep 'CRLF' )" ]] && echo '1' || true 
     } || {
         echo  "REQUIREs input file; stdout '1' if DOS; null if UNIX"
         return 99
@@ -300,7 +292,8 @@ flagupdate() {
 } 
 
 # User specific environment and startup programs
-PATH=$PATH:$HOME/.local/bin:$HOME/bin
+[[ "$PATH" =~ "$HOME/.bin:" ]] \
+    || PATH="$HOME/.bin:$PATH"
 
 # Get/set top-level shell PID [ps @ Cygwin prefixes 1st collumn w/ 'I' ]
 _PID_1xSHELL=$( ps |grep 'bash' |sort -k 7 |awk '{print $1;}' |head -n 1 )
@@ -308,3 +301,25 @@ _PID_1xSHELL=$( ps |grep 'bash' |sort -k 7 |awk '{print $1;}' |head -n 1 )
 [[ "$( isinteger $_PID_1xSHELL )" ]] || _PID_1xSHELL=$( ps |grep 'bash' |sort -k 7 |awk '{print $2;}' |head -n 1 )
 
 set +a  # END export 
+
+## End here if not interactive
+[[ -z "$PS1" ]] && return 0
+
+#[[ "$USERPROFILE" ]] || errMSG "FAILed @ USERPROFILE"
+
+[[ "$isBash" && "$hasWSL" ]] && {
+    # @ WSL 2 : Host IP is NOT localhost : some apps fail if DISPLAY not reset:
+    ## STDOUT of this wsl.exe statement includes a null byte. (Thank Microsoft.) 
+    ## This named-pipe scheme handles that, else warning text persists (@ STDOUT) regardless.
+    set +o posix          # if syntax not POSIX, abide other
+    mkfifo p1 
+    wsl.exe -l -v >p1 &
+    [[ $(cat <p1 |tr -d '\000' |grep ${_OS} |awk '{print $NF}' |grep 2) ]] && {
+        # Reset only at WSL 2 terminal
+        export DISPLAY=$(grep nameserver /etc/resolv.conf |awk '{print $2}'):0.0
+        #export DISPLAY='172.31.16.1:0.0'
+    }
+    rm p1
+}
+
+[[ "$BASH_SOURCE" ]] && echo "@ $BASH_SOURCE"
