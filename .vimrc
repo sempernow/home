@@ -1,8 +1,13 @@
+" $VIMRUNTIME/defaults.vim
+" /etc/vim/vimrc
+" /etc/vim/vimrc.local
+" ~/.vimrc
+"
 " $HOME/.vimrc    @ Cygwin 
 " /etc/vimrc      @ Git for Windows 
 " :set OPTION     @ Set any option while in the vim editor.
 " :help OPTION    @ Get option info while in the vim editor.
-" :set ts=4 sw=2 sts=0 et
+" :set ts=6 sw=2 sts=0 et ai smarttab
 
 function! UseTabs()
   set tabstop=4     " Size of a hard tabstop (ts).
@@ -33,7 +38,7 @@ set ignorecase                  " Case insensitive search
 set smartcase                   " Case insensitive search if capital letters
 set number                      " Display line numbers
 set nonumber                    " Do not display line numbers
-colo elflord                    " Color theme
+colo delek                      " Color scheme
 set wildmenu                    " Better command-line completion
 set nocompatible                " Required for vim (iMprovements), else is just vi
 set showmatch                   " Automatically show matching brackets, like bbedit.
@@ -44,7 +49,7 @@ set backspace=indent,eol,start  " Make that backspace key work the way it should
 set background=dark             " Default to colours that work well on dark background 
 set showmode                    " Show the current mode
 syntax on                       " Turn syntax highlighting on by default
-xnoremap p pgvy 				" Paste repeatedly"
+xnoremap p pgvy                 " Paste repeatedly"
 
 " Show EOL type and last modified timestamp, right after the filename
 set statusline=%<%F%h%m%r\ [%{&ff}]\ (%{strftime(\"%H:%M\ %d/%m/%Y\",getftime(expand(\"%:p\")))})%=%l,%c%V\ %P
@@ -53,5 +58,5 @@ set statusline=%<%F%h%m%r\ [%{&ff}]\ (%{strftime(\"%H:%M\ %d/%m/%Y\",getftime(ex
 filetype plugin indent on
 
 " YAML
-autocmd FileType yaml setlocal ai ts=2 sw=2 et
+" autocmd FileType yaml setlocal ai ts=2 sw=2 et
 

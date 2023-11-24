@@ -3,7 +3,7 @@
 # Allow 1st level subdirs
 !*/
 
-# Ignore specified first-level subdir content
+# Ignore specified subdir content
 secrets/
 keys/
 archives/
@@ -15,6 +15,7 @@ backup/
 
 # Allow all subdirs under specified 1st-level
 !/foo/**
+!.local/bin/**
 
 # Irgnore binaries (@Golang pattern)
 app/api/svc_1
@@ -52,6 +53,8 @@ app/sidecar/sc1/sc1
 make.md2html.sh
 make.perms.sh
 make.tarball.sh
+.bash_history
+.ash_history
 
 # Ignore symlinks
 symlinked/folder
