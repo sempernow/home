@@ -99,8 +99,7 @@ alias ip='ip -c'
 [[ ! "$(shopt -oq posix)" ]] && {
     [[ -f /usr/share/bash-completion/bash_completion ]] \
         && source /usr/share/bash-completion/bash_completion || {
-        [[ -f /etc/bash_completion ]] \
-            && source /etc/bash_completion
+            [[ -f /etc/bash_completion ]] && source /etc/bash_completion
     }
 }
 # Source all completions that abide compspec.
