@@ -115,7 +115,8 @@ _completion_loader(){
 ########
 # Prompt
 
-# Git-prompt function : __git_ps1 
+# Source git-prompt.sh, which exports all required by 
+# Git's conditional prompt function: __git_ps1. See PS1.
 [[ "$isBash" ]] && {
     git_prompt="${HOME}/.git-prompt.sh"
     [[ -f "$git_prompt" ]] && source $git_prompt || {
