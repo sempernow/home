@@ -287,7 +287,8 @@ flagupdate() {
 } 
 
 # User specific environment and startup programs
-PATH=$PATH:$HOME/.local/bin:$HOME/bin
+[[ "$PATH" =~ "$HOME/.bin:" ]] \
+    || PATH="$HOME/.bin:$PATH"
 
 # Get/set top-level shell PID [ps @ Cygwin prefixes 1st collumn w/ 'I' ]
 _PID_1xSHELL=$( ps |grep 'bash' |sort -k 7 |awk '{print $1;}' |head -n 1 )
