@@ -1,10 +1,12 @@
 # .bashrc
 
-# Execute only one set of bash configuration files on login;
-# Those for all users (/etc/profile.d/) else those at user's HOME.
-[[ "$SHLVL" == 1 ]] && [[ "$(ls -l /etc/profile.d |grep bashrc)" ]] && {
-    [[ "$BASH_SOURCE" =~ "/etc/profile.d" ]] || return
-}
+# # If interactive login shell, then source only the all-users configurations.
+# [[ -n "$PS1" ]] && [[ "$SHLVL" == 1 ]] && [[ "$(ls -l /etc/profile.d |grep bashrc)" ]] && {
+#     [[ "$BASH_SOURCE" =~ "/etc/profile.d" ]] || return
+# }
+
+[[ "$isBashrcSourced" ]] && return
+isBashrcSourced=1
 
 # Test for GNU Bourne-Again SHell (bash)
 [[ -n "${BASH_VERSION}" ]] && isBash=1 || unset isBash

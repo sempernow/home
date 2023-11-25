@@ -1,5 +1,8 @@
 # .bashrc_win
 
+[[ "$isBashWinSourced" ]] && return
+isBashWinSourced=1
+
 # End here lest environment has WSL(2)
 # [[ "$isWindows" ]] || return
 

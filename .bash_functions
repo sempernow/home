@@ -1,5 +1,8 @@
 # .bash_functions
 
+[[ "$isBashFunctionsSourced" ]] && return
+isBashFunctionsSourced=1
+
 # End here if functions already exist (run once)
 #[[ "$(type -t now)" ]] && return 
 
