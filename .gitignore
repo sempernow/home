@@ -15,7 +15,7 @@ backup/
 
 # Allow all subdirs under specified 1st-level
 !/foo/**
-!.local/bin/
+!.local/bin/**
 
 # Irgnore binaries (@Golang pattern)
 app/api/svc_1
