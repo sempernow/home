@@ -48,7 +48,7 @@ test :
 	echo ${HAS_WSL}
 	[[ "${HAS_WSL}" ]] && echo okay || echo fail
 
-user :
+user : perms
 	find . -maxdepth 1 -type f -iname '.*' -exec cp -p {} ~/ \;
 	chmod 0755 .local/bin/*
 	cp -rp .local/bin/* ~/.local/bin
@@ -59,7 +59,7 @@ user :
 	chmod 0644 ~/.vim*
 	chmod 0755 ~/.*.sh 
 
-all :
+all : perms
 	sudo cp -p ./.bashrc /etc/profile.d/${USER}-01-bashrc.sh
 	sudo cp -p ./.bash_functions /etc/profile.d/${USER}-02-bash_functions.sh
 	[[ "${HAS_WSL}" ]] && sudo cp -p ./.bash_win /etc/profile.d/${USER}-00-bash_win.sh

@@ -17,45 +17,20 @@ See the files. Run the recipes. Menu: `make`
 
 ## Install
 
-See recipes at `Makefile`, 
-
-```bash
-make
-```
-
-Else &hellip;
-
 For `$USER`
 
 ```bash
-# Download
-cd ~
 git clone https://github.com/sempernow/home.git
-# Install
-cp -p home/.* .
-# Cleanup
-rm -rf ~/home
+cd home
+make user
 ```
 
 For all users
 
 ```bash
-# Download
-cd ~
 git clone https://github.com/sempernow/home.git
-# Install
-sudo cp -p home/.bashrc /etc/profile.d/${USER}-01-bashrc.sh
-sudo cp -p home/.bash_functions /etc/profile.d/${USER}-02-bash_functions.sh
-sudo chmod 0644 /etc/profile.d/${USER}-*.sh
-## Git-enhanced prompt
-git_prompt_dir=/usr/share/git-core/contrib/completion
-sudo mkdir -p $git_prompt_dir
-sudo cp -p home/.git-prompt.sh $git_prompt_dir/git-prompt.sh
-sudo chmod 0755 $git_prompt_dir/git-prompt.sh
-## Config vim 
-sudo cp -p home/.vimrc /etc/vim/vimrc.local
-# Cleanup
-rm -rf ~/home
+cd home
+make all
 ```
 
 ## Demo 
