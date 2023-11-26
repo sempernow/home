@@ -405,7 +405,9 @@ shlvl(){
         }
         kubectl get sc
     }
-    psk(){ # ps aux ... all k8s-process commands and their options
+    psk(){ 
+        # ps aux, filtering through only k8s-related processes. 
+        # ARGs: [k8s-command-name(default: all)]
         k8s='
             containerd
             dockerd
@@ -423,7 +425,9 @@ shlvl(){
                 |grep -- -- |grep -v color |grep -v grep
         }
         export -f _ps
-        echo $k8s |xargs -n 1 /bin/bash -c '_ps "$@"' _
+        [[ "$1" ]] && _ps $1 || {
+            echo $k8s |xargs -n 1 /bin/bash -c '_ps "$@"' _
+        }
     }
 }
 
