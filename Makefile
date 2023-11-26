@@ -64,6 +64,7 @@ all :
 	sudo chmod 0644 /etc/profile.d/${USER}-*.sh
 	sudo mkdir -p ${GIT_PROMPT_DIR}
 	sudo cp -p ./.git-prompt.sh ${GIT_PROMPT_DIR}/git-prompt.sh
+	sudo mkdir -p /etc/vim
 	sudo cp -p ./.vimrc /etc/vim/vimrc.local
 
 ubox :
