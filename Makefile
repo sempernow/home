@@ -50,6 +50,8 @@ test :
 
 user :
 	find . -maxdepth 1 -type f -iname '.*' -exec cp -p {} ~/ \;
+	chmod 0755 .local/bin/*
+	cp -rp .local/bin/* ~/.local/bin
 	chmod 0644 ~/.profile
 	chmod 0644 ~/.bash*
 	chmod 0644 ~/.gitig*
@@ -62,6 +64,8 @@ all :
 	sudo cp -p ./.bash_functions /etc/profile.d/${USER}-02-bash_functions.sh
 	[[ "${HAS_WSL}" ]] && sudo cp -p ./.bash_win /etc/profile.d/${USER}-00-bash_win.sh
 	sudo chmod 0644 /etc/profile.d/${USER}-*.sh
+	sudo mkdir -p /usr/local/bin
+	sudo cp -p .local/bin/* /usr/local/bin
 	sudo mkdir -p ${GIT_PROMPT_DIR}
 	sudo cp -p ./.git-prompt.sh ${GIT_PROMPT_DIR}/git-prompt.sh
 	sudo mkdir -p /etc/vim
@@ -82,11 +86,13 @@ rbox :
 html : md2html perms
 
 md2html :
-	find . -type f -iname '*.md' -exec md2html.exe {} \;
+	find . -type f -iname '*.md' -exec md2html.exe "{}" \;
 
 perms :
 	find . -type f ! -path './.git/*' -exec chmod 0644 "{}" \+
 	find . -type f  -iname '*.sh' -exec chmod 0755 "{}" \+
+	find . -type f  -iname '*.sh' -exec chmod 0755 "{}" \+
+	chmod 0755 .local/bin/*
 
 getgit :
 	wget https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh
