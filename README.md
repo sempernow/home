@@ -15,27 +15,28 @@ See the files. Run the recipes. Menu: `make`
 
 [Git completion scripts](https://github.com/git/git/tree/master/contrib/completion "github.com/git")
 
+## Pull/Prep
+
+```bash
+git clone https://github.com/sempernow/home.git
+cd home
+```
+
 ## Install
 
 For `$USER`
 
 ```bash
-git clone https://github.com/sempernow/home.git
-cd home
 make user
 ```
 
 For all users
 
 ```bash
-git clone https://github.com/sempernow/home.git
-cd home
 make all
 ```
 
 ## Demo 
-
-Open new shell, or from current shell (after install) &hellip; 
 
 ```bash
 # Regular user

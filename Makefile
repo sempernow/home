@@ -85,13 +85,14 @@ rbox :
 
 html : md2html perms
 
-md2html :
+md2html : makehtml perms
+
+makehtml :
 	find . -type f -iname '*.md' -exec md2html.exe "{}" \;
 
 perms :
 	find . -type f ! -path './.git/*' -exec chmod 0644 "{}" \+
-	find . -type f  -iname '*.sh' -exec chmod 0755 "{}" \+
-	find . -type f  -iname '*.sh' -exec chmod 0755 "{}" \+
+	find . -type f ! -path './.git/*' -iname '*.sh' -exec chmod 0755 "{}" \+
 	chmod 0755 .local/bin/*
 
 getgit :
