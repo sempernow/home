@@ -248,6 +248,11 @@ shlvl(){
     [[ "${FUNCNAME[1]}" == 'x' ]] && _shlvl=$(( $SHLVL - 1 )) || _shlvl=$SHLVL
     [[ "$_shlvl" == "1" ]] && [[ "$PPID" == "$_PID_1xSHELL" ]] && { printf "\n %s\n" "$red $(( $_shlvl ))x ${SHELL##*/} $norm $_msg" ; } || { printf "\n %s\n" "$(( $_shlvl ))x ${SHELL##*/} $_msg" ; }
 }
+envsans(){
+    # Print environment variables without functions
+    declare -p |grep -E '^declare -x [^=]+=' |sed 's,",,g' |awk '{print $3}'
+    printf "\n\t(%s)\n" 'Environment variables containing special characters may not have printed accurately.'
+}
 
 #####
 # Git
