@@ -44,7 +44,7 @@ bash
 # Login shell
 bash --login
 # Root user
-sudo su -
+sudo su --login
 ```
 
 ## Demo at `bash` and `sh` Environments
