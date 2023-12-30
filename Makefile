@@ -28,6 +28,7 @@ export PRJ_ROOT := $(shell pwd)
 
 export GIT_PROMPT_DIR := /usr/share/git-core/contrib/completion
 export HAS_WSL        := $(shell type -t wsl.exe)
+export IS_EDN         := $(shell echo $$no_proxy |grep northgrum.com)
 ##############################################################################
 # Recipes : Meta
 
@@ -45,24 +46,34 @@ menu :
 	@echo "perms     : find . -type f ... -exec chmod ..."
 	
 test :
-	echo ${HAS_WSL}
+	echo "IS_EDN : ${IS_EDN}"
+	echo "HAS_WSL: ${HAS_WSL}"
 	[[ "${HAS_WSL}" ]] && echo okay || echo fail
 
 user : perms
 	find . -maxdepth 1 -type f -iname '.*' -exec cp -p {} ~/ \;
 	chmod 0755 .local/bin/*
 	cp -rp .local/bin/* ~/.local/bin
+	[[ "${HAS_WSL}" ]]  && sudo cp -p ./etc_profile.d/win.sh .bashrc_win || true
+	[[ "${IS_EDN}" ]]  && sudo cp -p ./etc_profile.d/edn.sh .bashrc_edn || true
 	chmod 0644 ~/.profile
 	chmod 0644 ~/.bash*
-	chmod 0644 ~/.gitig*
-	chmod 0644 ~/.gitco*
+	chmod 0644 ~/.gitignor*
+	chmod 0644 ~/.gitconf*
 	chmod 0644 ~/.vim*
-	chmod 0755 ~/.*.sh 
+	chmod 0755 ~/.*.sh
 
 all : perms
+	sudo rm /etc/profile.d/${USER}-??-*.sh
 	sudo cp -p ./.bashrc /etc/profile.d/${USER}-01-bashrc.sh
 	sudo cp -p ./.bash_functions /etc/profile.d/${USER}-02-bash_functions.sh
-	[[ "${HAS_WSL}" ]] && sudo cp -p ./.bash_win /etc/profile.d/${USER}-00-bash_win.sh
+	sudo cp -p ./etc_profile.d/*.sh /etc/profile.d/
+	[[ "${HAS_WSL}" ]] \
+		&& sudo mv /etc/profile.d/win.sh /etc/profile.d/${USER}-00-bashrc_win.sh \
+		|| sudo rm /etc/profile.d/win.sh
+	[[ "${IS_EDN}" ]] \
+		&& sudo mv /etc/profile.d/edn.sh /etc/profile.d/${USER}-00-bashrc_edn.sh \
+		|| sudo rm /etc/profile.d/edn.sh
 	sudo chmod 0644 /etc/profile.d/${USER}-*.sh
 	sudo mkdir -p /usr/local/bin
 	sudo cp -p .local/bin/* /usr/local/bin
@@ -94,6 +105,7 @@ perms :
 	find . -type f ! -path './.git/*' -exec chmod 0644 "{}" \+
 	find . -type f ! -path './.git/*' -iname '*.sh' -exec chmod 0755 "{}" \+
 	chmod 0755 .local/bin/*
+	chmod 0644 etc_profile.d/*.sh
 
 getgit :
 	wget https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh

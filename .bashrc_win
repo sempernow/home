@@ -1,5 +1,7 @@
-# .bashrc_win
-
+# source /etc/profile.d/win.sh
+##############################################
+# Configure bash shell @ WSL|Cygwin|GitBash
+##############################################
 [[ "$isBashWinSourced" ]] && return
 isBashWinSourced=1
 
@@ -301,8 +303,7 @@ _PID_1xSHELL=$( ps |grep 'bash' |sort -k 7 |awk '{print $1;}' |head -n 1 )
 set +a  # END export 
 
 ## End here if not interactive
-#[[ "$-" != *i* ]] && return 0
-[[ -n "$PS1" ]] || return 0
+[[ -z "$PS1" ]] && return 0
 
 [[ "$isBash" && "$hasWSL" ]] && {
     # @ WSL 2 : Host IP is NOT localhost : some apps fail if DISPLAY not reset:
@@ -319,5 +320,4 @@ set +a  # END export
     rm p1
 }
 
-#[[ "$BASH_SOURCE" ]] && echo "@ ${BASH_SOURCE##*/}"
-[[ "$BASH_SOURCE" ]] && echo "@ ${BASH_SOURCE}"
+[[ "$BASH_SOURCE" ]] && echo "@ $BASH_SOURCE"
