@@ -64,16 +64,16 @@ user : perms
 	chmod 0755 ~/.*.sh
 
 all : perms
-	sudo rm /etc/profile.d/${USER}-??-*.sh
+	sudo rm -f /etc/profile.d/${USER}-??-*.sh
 	sudo cp -p ./.bashrc /etc/profile.d/${USER}-01-bashrc.sh
 	sudo cp -p ./.bash_functions /etc/profile.d/${USER}-02-bash_functions.sh
 	sudo cp -p ./etc_profile.d/*.sh /etc/profile.d/
 	[[ "${HAS_WSL}" ]] \
 		&& sudo mv /etc/profile.d/win.sh /etc/profile.d/${USER}-00-bashrc_win.sh \
-		|| sudo rm /etc/profile.d/win.sh
+		|| sudo rm -f /etc/profile.d/win.sh
 	[[ "${IS_EDN}" ]] \
 		&& sudo mv /etc/profile.d/edn.sh /etc/profile.d/${USER}-00-bashrc_edn.sh \
-		|| sudo rm /etc/profile.d/edn.sh
+		|| sudo rm -f /etc/profile.d/edn.sh
 	sudo chmod 0644 /etc/profile.d/${USER}-*.sh
 	sudo mkdir -p /usr/local/bin
 	sudo cp -p .local/bin/* /usr/local/bin
