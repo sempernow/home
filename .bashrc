@@ -3,13 +3,16 @@
 # Aliases
 
 # Meta
-alias ffmpeg='ffmpeg -hide_banner'
-alias goclean='go clean -i -r -cache -testcache -fuzzcache'
-alias gpg=GnuPG
+
 alias os='cat /etc/os-release'
-alias pip='python3 -m pip'
-alias python=python3
+alias cpu='cat /proc/cpuinfo'
+alias mem='cat /proc/meminfo'
 alias vi=vim
+alias python=python3
+alias pip='python3 -m pip'
+[[ $(type -t go) ]] && alias goclean='go clean -i -r -cache -testcache -fuzzcache'
+[[ $(type -t ffmpeg) ]] && alias ffmpeg='ffmpeg -hide_banner'
+[[ $(type -t gpg) ]] && alias gpg=GnuPG
 
 # FS
 alias ls='ls -hl --color=auto --group-directories-first'
@@ -138,11 +141,11 @@ _completion_loader(){
 PS1=''
 [[ $isWindows ]] && {
     [[ "$_OS" ]] && {
-        PS1='\[\e]0;$_OS\007\]'                                                 # Window title
-        PS1="$PS1"'\n'                                                          # newline
+        PS1='\[\e]0;$_OS\007\]'                                             # Window title
+        PS1="$PS1"'\n'                                                      # newline
     } || {
-        PS1='\[\e]0;\u@\h\007\]'                                                # Window title
-        PS1="$PS1"'\n'                                                          # newline
+        PS1='\[\e]0;\u@\h\007\]'                                            # Window title
+        PS1="$PS1"'\n'                                                      # newline
     }
 }
 [[ "$_OS" ]] && {

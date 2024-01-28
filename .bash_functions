@@ -80,8 +80,9 @@ mode(){
     # OCTAL HUMAN FNAME
     [[ -d "$@" ]] && pushd "$@" > /dev/null
     printf "\n%s\n\n" " @ '$PWD'" 
-    find . -maxdepth 1 -type d -execdir stat --format=" %a  %A  %n" {} \+ |sed 's/\.\///'
-    find . -maxdepth 1 -type f -execdir stat --format=" %a  %A  %n" {} \+ |sed 's/\.\///'
+    find . -maxdepth 1 -type d -execdir stat --format=" %04a  %A  %n" {} \+ |sed 's/\.\///'
+    echo ''
+    find . -maxdepth 1 -type f -execdir stat --format=" %04a  %A  %n" {} \+ |sed 's/\.\///'
     [[ -d "$@" ]] && popd > /dev/null
     printf "\n"
 }
@@ -91,18 +92,30 @@ owner(){
     # OWNER[UID] GROUP[GID] PERMS[OCTAL] FNAME
     [[ -d "$@" ]] && pushd "$@" > /dev/null
     printf "\n%s\n\n" " @ '$PWD'" 
-    find . -maxdepth 1 -type d -execdir stat --format=" %U[%u]  %G[%g]  %A[%a]  %n" {} \+ |sed 's/\.\///' |sed 's/Administrators/Admns/'
-    find . -maxdepth 1 -type f -execdir stat --format=" %U[%u]  %G[%g]  %A[%a]  %n" {} \+ |sed 's/\.\///' |sed 's/Administrators/Admns/'
+    find . -maxdepth 1 -type d -execdir stat --format=" %U[%u]  %G[%g]  %A[%04a]  %n" {} \+ |sed 's/\.\///' |sed 's/Administrators/Admns/'
+    echo ''
+    find . -maxdepth 1 -type f -execdir stat --format=" %U[%u]  %G[%g]  %A[%04a]  %n" {} \+ |sed 's/\.\///' |sed 's/Administrators/Admns/'
     [[ -d "$@" ]] && popd > /dev/null
     printf "\n"
+}
+selinux(){
+    [[ -d "$@" ]] && pushd "$@" > /dev/null
+    printf "\n%s\n\n" " @ '$PWD'" 
+    find . -maxdepth 1 -type d -execdir stat --format=" %04a  %A  %C  \t%n" {} \+ |sed 's/\.\///'
+    echo ''
+    find . -maxdepth 1 -type f -execdir stat --format=" %04a  %A  %C  \t%n" {} \+ |sed 's/\.\///'
+    [[ -d "$@" ]] && popd > /dev/null
+    printf "\n"
+
 }
 
 #########
 # systemd
-
-journal(){ 
+units(){ systemctl list-unit-files; }
+journal(){ # -e : Jump to end, --no-pager : Show full message (else each is truncated).
+    [[ $2 ]] && { sudo journalctl --no-pager -e $@; return 0; }
     [[ $1 ]] && sudo journalctl --no-pager -e -u $@
-    [[ $1 ]] || sudo journalctl --no-pager -e
+    [[ $1 ]] || sudo journalctl --no-pager -xe
 }
 
 #######
