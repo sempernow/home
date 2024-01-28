@@ -97,6 +97,14 @@ owner(){
     printf "\n"
 }
 
+#########
+# systemd
+
+journal(){ 
+    [[ $1 ]] && sudo journalctl --no-pager -e -u $@
+    [[ $1 ]] || sudo journalctl --no-pager -e
+}
+
 #######
 # Utils
 
