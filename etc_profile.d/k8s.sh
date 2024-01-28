@@ -12,6 +12,7 @@ unset flag_any_k8s
     flag_any_k8s=1
     pods(){ echo "$(sudo crictl pods |grep -v STATE |awk '{print $1}')"; }
     containers(){ echo "$(sudo crictl ps |grep -v STATE |awk '{print $1}')"; }
+    set +o posix # Abide non-POSIX syntax 
     source <(crictl completion)
 }
 
@@ -90,6 +91,7 @@ unset flag_any_k8s
 [[ $(type -t minikube) ]] && {
     flag_any_k8s=1
 
+    set +o posix # Abide non-POSIX syntax 
     source <(minikube completion bash)
     
     # d2m : Configure host's Docker client (docker) to Minikube's Docker server.
