@@ -2,53 +2,75 @@
 _ansibash(){
 
     usage(){
-        #>>>  MUST PRESERVE TABs of HEREDOC  <<<
+        #***  MUST PRESERVE TABs of HEREDOC  ***
 		cat <<-EOH
 
-			  A Bash/GNU sort of Ansible
+			  A Bash/GNU sort of Ansible having neither dependencies nor configurations
+			  beyond those of OpenSSH (Hosts and User) and the exported environment$below. 
 
-			  USAGE:  ${0##*/} -x "command1 && command2 arg1" # Default sans "-*". 
-			          ${0##*/} -c 'command1 arg1;command2 argX "\$remote_foo"'
-			          ${0##*/} -s "/path/of/local/script.sh arg1 '\$local_foo' arg3"
-			          ${0##*/} -u /path/of/local/source [/path/of/remote/parent (else ./source)]
-			          ${0##*/} -d /path/of/remote/source [/path/of/local/parent (else ./source)]
+			  Provision and/or configure all target machines of ANSIBASH_TARGET_LIST,
+			  as ANSIBASH_USER, using ad-hoc commands and/or local or remote scripts:
+			  
+			  USAGE:  ${0##*/} [-x] "command '\$local_arg1' 'local arg 2' '\\\$remote_arg'" 
+			          ${0##*/} -c 'command1 args;command2 argX "\$remote_arg" && command3 argY'
+			          ${0##*/} -s "/path/to/local/script.sh arg1 '\$local_arg' '\\\$remote_arg'"
+			          ${0##*/} -u /path/to/local/source [/path/to/remote/parent (Default:~)]
+			          ${0##*/} -d /path/to/remote/source [/path/to/local/parent (Default:.)]
 		EOH
     }
     want(){
-        #>>>  MUST PRESERVE TABs of HEREDOC  <<<
+        #***  MUST PRESERVE TABs of HEREDOC  ***
 		cat <<-EOH
 
-			  REQUIREs: ANSIBASH_TARGET_LIST : Environment variable listing the ssh-configured machines.
+			  REQUIREs: Environment variables declaring (ssh-configured) host(s) and user.
 
-			            export ANSIBASH_TARGET_LIST='host1 host2 host3'
+			            export ANSIBASH_TARGET_LIST='host1 host2.local 10.160.100.3'
+			            export ANSIBASH_USER='Optional(Default:$USER)'
+
+			            Any declared "User <name>" in ~/.ssh/config overrides ANSIBASH_USER 
+			            at any such ssh-configured "Host <name>" in ANSIBASH_TARGET_LIST.
+
 		EOH
     }
     have(){
-        #>>>  MUST PRESERVE TABs of HEREDOC  <<<
+        #***  MUST PRESERVE TABs of HEREDOC  ***
 		cat <<-EOH
 
 			  ANSIBASH_TARGET_LIST='$ANSIBASH_TARGET_LIST'
+			  ANSIBASH_USER='$user'
+
 		EOH
     }
+    ssh_user(){
+        # Override $user with ssh-configured "User <name>" if so declared of this target VM ($1) under "Host $1".
+        [[ $1 ]] || { echo "$user";return 0; }
+        _ssh_user=$(grep -A5 'Host ' ~/.ssh/config |grep -A5 " $1" |grep User |awk '{print $2}' |head -n1)
+        [[ $_ssh_user ]] && echo "$_ssh_user" || echo "$user"
+    }
 
-    [[ $ANSIBASH_TARGET_LIST ]] || { usage;want;exit; }
+    user=${ANSIBASH_USER:-$USER}
+    [[ $user ]] || user=$(id -un)
+
+    [[ $ANSIBASH_TARGET_LIST ]] || { below=' (below)';usage;want;exit; }
     [[ $@ ]] || { usage;have;exit; }
     [[ "${1:0:1}" != '-' ]] && mode='-x' || { mode=$1;shift; }
-    [[ $4 ]] && more='…'
+    [[ $4 ]] && more='…' || unset more
     [[ "$mode" == '-u' ]] && { 
         [[ $2 ]] && target=$2 || target=${1##*/}
     }
 
     for vm in $ANSIBASH_TARGET_LIST
     do
-        echo "=== @ $vm : $1 $2 $3 $more"
-        [[ $mode == '-x' ]] && ssh $vm "$@"                     # Ad-hoc command(s) execute at remote default shell
-        [[ $mode == '-c' ]] && ssh $vm '/bin/bash -c' "$@"      # Ad-hoc command(s) execute at remote /bin/bash
-        [[ $mode == '-s' ]] && ssh $vm '/bin/bash -s' < "$@"    # Local script executes at remote /bin/bash
-        [[ $mode == '-u' ]] && scp -pr "$1" "$vm:$target"       # Upload (push) via OpenSSH secure file copy
-        [[ $mode == '-d' ]] && scp -pr "$vm:$1" "${2:-.}/${vm}_${1##*/}" # Download (pull) via OpenSSH secure file copy
+        conn=$(ssh_user $vm)@$vm
+        echo "=== $conn : $1 $2 $3 $more"
+        [[ $mode == '-x' ]] && ssh $conn "$@"                     
+        [[ $mode == '-c' ]] && ssh $conn '/bin/bash -c' "$@"     
+        [[ $mode == '-s' ]] && ssh $conn '/bin/bash -s' < "$@"  
+        [[ $mode == '-u' ]] && scp -pr "$1" "$conn:$target"    
+        [[ $mode == '-d' ]] && scp -pr "$conn:$1" "${2:-.}/${vm}_${1##*/}" 
     done 
-    true
+
+    return 0
 }
 
 _ansibash "$@"

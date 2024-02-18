@@ -47,7 +47,7 @@ menu :
 
 	$(INFO) 'Meta'
 	@echo "html      : .MD -> .HTML"
-	echo "perms      : find . -type f … -exec chmod …"
+	@echo "perms     : find . -type f … -exec chmod …"
 
 env :
 	@echo "IS_EDN  : ${IS_EDN}"

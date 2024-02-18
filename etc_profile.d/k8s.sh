@@ -111,8 +111,12 @@ unset flag_any_k8s
     }
 }
 
-# Helm : Save (.tar) all Docker-image dependencies of a chart 
+# Helm : Capture all dependencies of a chart
+# Save (.tar) all Docker-image dependencies of a chart 
 # using three helper functions: hdi (list), hvi (validate), dis (save).
+#   hdi $extracted # Folder extracted by: "tar xaf $chart.tgz"
+#   hvi hdi@${extracted}.log
+#   dis hvi@hdi@${extracted}.log
 [[ $(type -t helm) && $(type -t docker) ]] && {
     flag_any_k8s=1
     # List all Docker images of an extracted Helm chart $1 (directory).
