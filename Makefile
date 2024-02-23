@@ -35,7 +35,7 @@ export IS_EDN         := $(shell echo $$no_proxy |grep northgrum.com)
 
 menu :
 	$(INFO) 'Install'
-	@echo "sync      : Sync .local/bin with ~/.bin if both exist"
+	@echo "sync      : Sync .local/bin to ~/.bin and /usr/local/bin"
 	@echo "user      : Configure bash shell for this user (${USER})."
 	@echo "all       : Configure bash shell for all users."
 	

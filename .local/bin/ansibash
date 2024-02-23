@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+export ANSIBASH_VERSION='0.2.0'
+
 _ansibash(){
 
     usage(){
@@ -65,5 +67,10 @@ _ansibash(){
 
     return 0
 }
+
+ [[ "$1" == 'version' ]] && {
+    echo "  v$ANSIBASH_VERSION"
+    exit 0
+ }
 
 _ansibash "$@"

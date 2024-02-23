@@ -12,6 +12,9 @@ sync_bins(){
     find .local/bin -type f -exec /bin/bash -c '
         cp -up $1 ~/.bin/
         cp -up ~/.bin/${1##*/} .local/bin/
+        sudo cp -up $1 /usr/local/bin/
+        sudo cp -up /usr/local/bin/${1##*/} .local/bin/
+        sudo chown root:root /usr/local/bin/${1##*/}
     ' _ {} \;
     chmod 0755 .local/bin/*
     return 0
