@@ -36,7 +36,7 @@ _ansibash(){
 		cat <<-EOH
 
 			  ANSIBASH_TARGET_LIST='$ANSIBASH_TARGET_LIST'
-			  ANSIBASH_USER='$user'
+                    ANSIBASH_USER='$(ssh_user)'
 
 		EOH
     }
@@ -59,9 +59,11 @@ _ansibash(){
         conn=$(ssh_user $vm)@$vm
         echo "=== $conn : $1 $2 $3 $more"
         [[ $mode == '-x' ]] && ssh $conn "$@"                     
-        [[ $mode == '-c' ]] && ssh $conn '/bin/bash -c' "$@"     
-        [[ $mode == '-s' ]] && ssh $conn '/bin/bash -s' < "$@"  
-        [[ $mode == '-u' ]] && scp -pr "$1" "$conn:$target"    
+        [[ $mode == '-c' ]] && ssh $conn /bin/bash -c "$@"     
+        [[ $mode == '-s' ]] && { 
+            ssh $conn /bin/bash -s < $1 $2 $3 $4 $5 $6 $7 $8 $9 
+        } 
+        [[ $mode == '-u' ]] && scp -pr "$1" $conn:$target    
         [[ $mode == '-d' ]] && scp -pr "$conn:$1" "${2:-.}/${vm}_${1##*/}" 
     done 
 
@@ -69,7 +71,7 @@ _ansibash(){
 }
 
  [[ "$1" == 'version' ]] && {
-    echo "  v$ANSIBASH_VERSION"
+    echo "v$ANSIBASH_VERSION"
     exit 0
  }
 
