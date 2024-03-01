@@ -30,7 +30,14 @@ function! Yaml()
   set autoindent                  " indent line per preceeding line
 endfunction
 
+function! List()
+  set list                               " Show control chars TAB and SPACE
+  "set listchars=tab:▸\ ,space:·          " Show TAB as "▸   " and SPACE as"·"
+  set listchars=tab:▸\ ,space:·,trail:•  " Show TAB as "▸   ", SPACE as"·", and traling SPACE as "•"
+endfunction
+
 call UseSpaces()
+call List()
 
 set clipboard=unnamed           " Set clipboard to unnamed to access system clipboard @ Windows
 set noswapfile                  " Prevent vim's zombie swap-file clusterfuck
