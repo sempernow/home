@@ -6,22 +6,26 @@
 #######################################################################
 
 sync_bins(){
-    [[ -d ~/.bin ]] || return 0 
+    # Sync scripts of .local/bin/ with others
     [[ -d .local/bin ]] || return 0
     sudo chmod 0755 .local/bin/*
     find .local/bin -type f -exec /bin/bash -c '
-        sudo cp -up $1 ~/.bin/
-        sudo cp -up ~/.bin/${1##*/} .local/bin/
-        sudo cp -up $1 /usr/local/bin/
-        sudo cp -up /usr/local/bin/${1##*/} .local/bin/
-        sudo chown root:root /usr/local/bin/${1##*/}
+        [[ -d ~/.bin ]] && {
+            sudo cp -up $1 ~/.bin/
+            sudo cp -up ~/.bin/${1##*/} .local/bin/
+        }
+        [[ -d /usr/local/bin ]] && {
+            sudo cp -up $1 /usr/local/bin/
+            sudo cp -up /usr/local/bin/${1##*/} .local/bin/
+            sudo chown root:root /usr/local/bin/${1##*/}
+            sudo chown $(id -u):$(id -g) .local/bin/*
+        }
     ' _ {} \;
-    sudo chown $(id -u):$(id -g) .local/bin/*
-    chmod 0755 .local/bin/*
     return 0
 }
 
 user(){
+    # Configure current user
     find . -maxdepth 1 -type f -iname '.*' -exec cp -p {} ~/ \;
     find etc_profile.d -type f -iname '*.sh' -exec /bin/bash -c '
         f=${1##*/};cp -p $1 ${0}/.bashrc_${f%%.*}
@@ -47,6 +51,7 @@ user(){
 }
 
 _as(){
+    # Configure all users as is current user
     id=$1
     HAS_WSL=$2
     IS_EDN=$3
@@ -77,7 +82,8 @@ _as(){
 
 export DECL=$(declare -f _as)
 
-all(){ 
+all(){
+    # Configure all users
     export id=$(id -u)
     hasSudo=$(type -t sudo)
 
@@ -96,3 +102,4 @@ all(){
 }
 
 "$@"
+

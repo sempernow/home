@@ -3,8 +3,8 @@
 " /etc/vim/vimrc.local
 " ~/.vimrc
 "
-" $HOME/.vimrc    @ Cygwin 
-" /etc/vimrc      @ Git for Windows 
+" $HOME/.vimrc    @ Cygwin.
+" /etc/vimrc      @ Git for Windows.
 " :set OPTION     @ Set any option while in the vim editor.
 " :help OPTION    @ Get option info while in the vim editor.
 " :set ts=6 sw=2 sts=0 et ai smarttab
@@ -44,16 +44,16 @@ set noswapfile                  " Prevent vim's zombie swap-file clusterfuck
 set ignorecase                  " Case insensitive search
 set smartcase                   " Case insensitive search if capital letters
 set number                      " Display line numbers
-set nonumber                    " Do not display line numbers
-colo delek                      " Color scheme
+"set nonumber                    " Do not display line numbers
 set wildmenu                    " Better command-line completion
 set nocompatible                " Required for vim (iMprovements), else is just vi
 set showmatch                   " Automatically show matching brackets, like bbedit.
 set vb                          " Turn on the 'visual bell'; much quieter than 'audio blink'
 set ruler                       " Show the cursor position all the time
 set laststatus=2                " Make last line (status) two lines deep, so always visible
-set backspace=indent,eol,start  " Make that backspace key work the way it should
-set background=dark             " Default to colours that work well on dark background 
+set backspace=indent,eol,start  " Make the backspace key work the way it should
+"set background=dark             " Default to colours that work well on dark background
+colo delek                      " Color scheme
 set showmode                    " Show the current mode
 syntax on                       " Turn syntax highlighting on by default
 xnoremap p pgvy                 " Paste repeatedly"
