@@ -34,12 +34,18 @@ utc(){
     t="$(date '+%Y-%m-%dT%H:%M:%S')";echo "$t"
     #[[ ! "$1" ]] && { [[ $(type -t putclip) ]] && putclip "$t"; } 
 }
-utcz(){ 
-    # YYY-MM-DDTHH.mm.ssZ
+utco(){ 
+    # YYY-MM-DDTHH.mm.ss-HHHH.TZ  : I.e., this zone's Offset (-HHHH) and its name (TZ)
+    t="$(date '+%Y-%m-%dT%H:%M:%S%z.%Z')";echo "$t"
+    #[[ ! "$1" ]] && { [[ $(type -t putclip) ]] && putclip "$t"; } 
+}
+gmt(){ 
+    # YYY-MM-DDTHH.mm.ssZ  : Appends "Z" for Zero offset AKA "Zulu time" by US military's phonetic alpahabet
     t="$(date -u '+%Y-%m-%dT%H:%M:%SZ')";echo "$t"
     #[[ ! "$1" ]] && { [[ $(type -t putclip) ]] && putclip "$t"; } 
 }
-alias gmt=utcz;alias zulu=utcz
+alias zulu=gmt
+alias utcz=gmt
 iso(){
     # YYY-MM-DDTHH.mm.ss+/-HH:mm
     t="$(date --iso-8601=seconds)";echo "$t"
@@ -57,7 +63,7 @@ isoz(){
 ug(){ printf "$(id -u):$(id -g)"; }
 path() { 
     # Parse and print $PATH 
-    clear ; echo ; echo '  $PATH [parsed]'; echo
+    clear ; echo ; echo '  $PATH (parsed)'; echo
     declare IFS=: ; printf '  %s\n' $PATH
 }
 [[ $(type -t pushd) ]] && {
@@ -76,37 +82,45 @@ path() {
     temp(){ push "$TMPDIR"; }
 }
 mode(){ 
-    # ARGs: [DIR(Default:$PWD)]
-    # OCTAL HUMAN FNAME
-    [[ -d "$@" ]] && pushd "$@" > /dev/null
-    printf "\n%s\n\n" " @ '$PWD'" 
-    find . -maxdepth 1 -type d -execdir stat --format=" %04a  %A  %n" {} \+ |sed 's/\.\///'
+    # octal human fname
+    # ARGs: [path(Default:.)]
+    [[ -f "$@" ]] && {
+        find "${@%/*}" -maxdepth 1 -type f -iname "${@##*/}" -execdir stat --format=" %04a  %A  %n" {} \+ |sed 's/\.\///'
+        return 0
+    }
+    [[ -d "$@" ]] && d="$@" || d='.'
+    find "$d" -maxdepth 1 -type d -execdir stat --format=" %04a  %A  %n" {} \+ |sed 's/\.\///'
     echo ''
-    find . -maxdepth 1 -type f -execdir stat --format=" %04a  %A  %n" {} \+ |sed 's/\.\///'
-    [[ -d "$@" ]] && popd > /dev/null
-    printf "\n"
+    find "$d" -maxdepth 1 -type f -execdir stat --format=" %04a  %A  %n" {} \+ |sed 's/\.\///'
 }
 alias perms=mode
 owner(){ 
-    # ARGs: [DIR(Default:$PWD)]
-    # OWNER[UID] GROUP[GID] PERMS[OCTAL] FNAME
-    [[ -d "$@" ]] && pushd "$@" > /dev/null
-    printf "\n%s\n\n" " @ '$PWD'" 
-    find . -maxdepth 1 -type d -execdir stat --format=" %U[%u]  %G[%g]  %A[%04a]  %n" {} \+ |sed 's/\.\///' |sed 's/Administrators/Admns/'
+    # owner[uid] group[gid] perms[octal] fname
+    # ARGs: [path(Default:.)]
+    [[ -f "$@" ]] && {
+        find "${@%/*}" -maxdepth 1 -type f -iname "${@##*/}" -execdir stat --format=" %U[%u]  %G[%g]  %A[%04a]  %n" {} \+ |sed 's/\.\///' |sed 's/Administrators/Admns/'
+        return 0
+    }
+    [[ -d "$@" ]] && d="$@" || d='.'
+    find "$d" -maxdepth 1 -type d -execdir stat --format=" %U[%u]  %G[%g]  %A[%04a]  %n" {} \+ |sed 's/\.\///' |sed 's/Administrators/Admns/'
     echo ''
-    find . -maxdepth 1 -type f -execdir stat --format=" %U[%u]  %G[%g]  %A[%04a]  %n" {} \+ |sed 's/\.\///' |sed 's/Administrators/Admns/'
-    [[ -d "$@" ]] && popd > /dev/null
-    printf "\n"
+    find "$d" -maxdepth 1 -type f -execdir stat --format=" %U[%u]  %G[%g]  %A[%04a]  %n" {} \+ |sed 's/\.\///' |sed 's/Administrators/Admns/'
 }
 selinux(){
-    [[ -d "$@" ]] && pushd "$@" > /dev/null
-    printf "\n%s\n\n" " @ '$PWD'" 
-    find . -maxdepth 1 -type d -execdir stat --format=" %04a  %A  %C  \t%n" {} \+ |sed 's/\.\///'
+    # SELinux security context : See: man stat (%C)
+    # ARGs: [path(Default:.)]
+    [[ $(type -t getenforce) ]] || {
+        echo "  REQUIREs: SELinux"
+        return 0
+    }
+    [[ -f "$@" ]] && {
+        find "${@%/*}" -maxdepth 1 -type f -iname "${@##*/}" -execdir stat --format=" %04a  %A  %C  %n" {} \+ |sed 's/\.\///'
+        return 0
+    }
+    [[ -d "$@" ]] && d="$@" || d='.'
+    find "$d" -maxdepth 1 -type d -execdir stat --format=" %04a  %A  %C  %n" {} \+ |sed 's/\.\///'
     echo ''
-    find . -maxdepth 1 -type f -execdir stat --format=" %04a  %A  %C  \t%n" {} \+ |sed 's/\.\///'
-    [[ -d "$@" ]] && popd > /dev/null
-    printf "\n"
-
+    find "$d" -maxdepth 1 -type f -execdir stat --format=" %04a  %A  %C  %n" {} \+ |sed 's/\.\///'
 }
 
 #########
