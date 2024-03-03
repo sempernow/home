@@ -68,6 +68,7 @@ _ansibash(){
         [[ $mode == '-u' ]] && scp -pr "$1" $conn:$target
         [[ $mode == '-d' ]] && scp -pr "$conn:$1" "${2:-.}/${vm}_${1##*/}"
         ## TODO : Add rsync method(s) to handle directory push/pull.
+        echo ''
     done
 
     return 0
@@ -79,3 +80,4 @@ _ansibash(){
  }
 
 _ansibash "$@"
+
