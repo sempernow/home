@@ -1,7 +1,8 @@
-# [`home`](https://github.com/sempernow/home "GitHub/sempernow/home") 
+# [`sempernow/home`](https://github.com/sempernow/home "GitHub.com") 
 
-Shell configuration. 
-All The Things (aliases and functions) for a happy `HOME` in any box.
+>A portable Bash shell configuration that adapts to its environment and has many helpers (aliases, functions, completions, &hellip;), including those for `git`, `docker`, `kubectl` and `helm`.
+
+Tested on:
 
 - Linux
     - `bash`
@@ -10,13 +11,7 @@ All The Things (aliases and functions) for a happy `HOME` in any box.
 - Windows Git bash
 - Cygwin
 
-## The Things
-
-See the files. Run the recipes. Menu: `make`
-
-[Git completion scripts](https://github.com/git/git/tree/master/contrib/completion "github.com/git")
-
-## Pull/Prep
+## Get
 
 ```bash
 git clone https://github.com/sempernow/home.git
@@ -37,8 +32,8 @@ For all users
 make all
 ```
 
-If the targert environment lacks `make`, 
-then use [`make.recipes.sh`](make.recipes.sh)
+If the environment lacks `make`, 
+then use [`make.recipes.sh`](make.recipes.sh):
 
 ```bash
 # For $USER
@@ -85,7 +80,7 @@ docker run --rm -d --name $app -v $(pwd):/root -w /root ubuntu sleep 1d
 ```bash
 docker exec -it $app bash
 ```
-- Fails @ `sh`
+- Note this fails at `sh`
 
 Useful:
 
@@ -96,27 +91,10 @@ adduser u1
 export LANG=${LANG:-C.UTF-8}
 ```
 
+## References:
+
+- [Git completion scripts](https://github.com/git/git/tree/master/contrib/completion "github.com/git")
+
 
 ### &nbsp;
-<!-- 
-
-# Markdown Cheatsheet
-
-[Markdown Cheatsheet](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet "Wiki @ GitHub")
-
-
-# Link @ (HTML | MD)
-
-([HTML](file:///d:/1%20Data/IT/___.html "@ browser") | [MD](file:///d:/1%20Data/IT/___.md "___"))   
-
-
-# Bookmark
-
-- Reference
-[Foo](#foo)
-
-- Target
-<a name="foo"></a>
-
--->
 
