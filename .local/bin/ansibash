@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-export ANSIBASH_VERSION='0.2.3'
+export ANSIBASH_VERSION='0.2.4'
 
 _ansibash(){
 
@@ -59,11 +59,12 @@ _ansibash(){
     do
         conn=$(ssh_user $vm)@$vm
         echo "=== $conn : $1 $2 $3 $more"
+        ssh $conn logger "ansibash : BY $(id -un)@$(hostname) AS $conn : $1 ..."
         [[ $mode == '-x' ]] && ssh $conn "$@"
         [[ $mode == '-c' ]] && ssh $conn /bin/bash -c "$@"
         [[ $mode == '-s' ]] && {
             # Must list each positional param else may error: "ambiguous redirect"
-            ssh $conn /bin/bash -s < $1 $2 $3 $4 $5 $6 $7 $8 $9
+            ssh -T $conn /bin/bash -s < $1 $2 $3 $4 $5 $6 $7 $8 $9
         }
         [[ $mode == '-u' ]] && scp -pr "$1" $conn:$target
         [[ $mode == '-d' ]] && scp -pr "$conn:$1" "${2:-.}/${vm}_${1##*/}"
@@ -75,7 +76,7 @@ _ansibash(){
 }
 
  [[ "$1" == 'version' ]] && {
-    echo "v$ANSIBASH_VERSION"
+    echo "  v$ANSIBASH_VERSION"
     exit 0
  }
 
