@@ -1,7 +1,7 @@
 # source .bash_functions || source /etc/profile.d/${USER}-02-bash_functions.sh
 
-[[ "$isBashFunctionsSourced" ]] && return
-isBashFunctionsSourced=1
+#[[ "$isBashFunctionsSourced" ]] && return
+#isBashFunctionsSourced=1
 
 # End here if functions already exist (run once)
 #[[ "$(type -t now)" ]] && return 
@@ -180,6 +180,148 @@ _hash() {
     fi
 }
 woff2base64() { [[ "$(type -t base64)" && -f "$@" ]] && base64 -w 0 "$@"; }
+
+#########
+# Network
+
+ip4(){ [[ $1 ]] && ip -4 -brief addr show $1 || ip -4 -brief addr; }
+ip6(){ [[ $1 ]] && ip -6 -brief addr show $1 || ip -6 -brief addr; }
+
+tls(){
+    unset artifact 
+    case $1 in
+        "cnf")
+            # Make configuration file (.cnf) for CSR
+            [[ $2 ]] || {
+                echo "  USAGE: $FUNCNAME cnf CN"
+                # ***  PRESERVE TABS of HEREDOC  ***
+				cat <<-EOH
+				
+				Set environment variable(s) to override their default:
+				
+				TLS_C=US
+				TLS_ST=NY
+				TLS_L=Gotham
+				TLS_O='Foo Inc'
+				TLS_OU=DevOps
+				EOH
+
+                return 0
+            }
+            artifact="${2}.cnf"
+            # ***  PRESERVE TABS of HEREDOC  ***
+			cat <<-EOH |tee $artifact
+			[req]
+			prompt = no
+			distinguished_name = req_dn
+			req_extensions = req_ext
+			[req_dn]
+			CN = $2
+			C  = ${TLS_C:-US}
+			ST = ${TLS_ST:-NY}
+			L  = ${TLS_L:-Gotham}
+			O  = ${TLS_O:-Foo Inc}
+			OU = ${TLS_OU:-DevOps}
+			[req_ext]
+			subjectAltName = @alt_names
+			keyUsage = digitalSignature, keyEncipherment
+			extendedKeyUsage = serverAuth, clientAuth
+			[alt_names]
+			DNS.1 = $2
+			DNS.2 = *.$2
+			EOH
+            # Others under [req_ext]
+            # certificatePolicies = $policy_OID
+            # authorityInfoAccess = caIssuers;URI:http://example.com/ca.pem, OCSP;URI:http://ocsp.example.com
+            # basicConstraints = CA:FALSE
+        ;;
+        "key")
+            ### Generate RSA private key 
+            [[ $2 ]] || {
+                echo "  USAGE: $FUNCNAME key CN [key-length(Default:2048)]"
+                return 0
+            }
+            artifact=${2}.key
+            openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:${3:-2048} -out $artifact
+        ;;
+        "csr")
+            [[ $2 == "make" ]] && {
+                    [[ $3 && -f $4 && -f $5 ]] && {
+                        # Make CSR
+                        artifact=$3.csr
+                        openssl req -new -sha256 -key $5 -extensions req_ext -config $4 -out $artifact
+                    } || {
+                        [[ $3 && -f $4 ]] && {
+                            # Make Private Key and CSR
+                            artifact=$3.csr
+                            openssl req -new -newkey rsa:${5:-2048} -extensions req_ext -config $4 -noenc -keyout $3.key -out $3.csr
+                        } || {
+                            echo "  
+                                USAGE: 
+
+                                    Make CSR using existing private key:
+                                    $FUNCNAME csr make CN CNF_PATH PRIVATE_KEY_PATH [Key-length(Default:2048)]
+
+                                    Make CSR and private key:
+                                    $FUNCNAME csr make CN CNF_PATH [Key-length(Default:2048)]
+                            "
+                            return 0
+                        }
+                    }
+                } || {
+                    # Verify CSR
+                    artifact="/tmp/tls.verify.${2##*/}.log"
+                    [[ -f $2 ]] || {
+                        echo "  USAGE: $FUNCNAME csr CSR_PATH"
+                        return 0
+                    }
+                    openssl req -text -noout -verify -in $2 |& tee $artifact
+                }
+            ;;
+        "server")
+            # GET full-chain (-showcerts) certificate of host (server) $2 via port $3
+            [[ $2 ]] || {
+                echo "  USAGE: $FUNCNAME server HOST [PORT(Default:443)]"
+                return 0
+            }
+            artifact="/tmp/tls.server.${2}_${3:-443}_full_chain_cert.log"
+            # -servername limits to the declared domain name using Server Name Indication (SNI)
+            openssl s_client -connect $2:${3:-443} -servername $2 -showcerts < /dev/null |& tee "$artifact"
+        ;;
+        "crt")
+            [[ $2 == "verify" ]] && {
+                [[ -f $3 && -f $4 ]] && {
+                    artifact=/tmp/tls.crt.verify.${3##*/}.log
+                    openssl verify -CAfile $3 $4 |& tee $artifact
+                } || {
+                    echo "  USAGE: $FUNCNAME crt verify CA_CERT_BUNDLE SERVER_CERT"
+                    return 0
+                }
+            } 
+            [[ $2 == "parse" ]] && {
+                [[ -f $3 ]] && {
+                    artifact=/tmp/tls.crt.parse.${3##*/}.log
+                    openssl x509 -in $3 -text -noout |& tee $artifact 
+                } || {
+                    echo "  USAGE: $FUNCNAME crt parse SERVER_CERT"
+                    return 0
+                }
+            } 
+        ;;
+        *)
+            echo ' USAGE:
+                tls key         : Make RSA private key file (.key)
+                tls cnf         : Make configuration file (.cnf) for CSR 
+                tls csr make    : Make CSR file (.csr)
+                tls csr         : Verify CSR 
+                tls crt parse   : Parse certificate
+                tls crt verify  : Verify certificate 
+                tls server      : Get full-chain certificate of a server
+            '
+        ;;
+    esac 
+    [[ -f $artifact ]] && printf "\n  %s\n" "See: $artifact"
+}
 
 #####
 # ssh
