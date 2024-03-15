@@ -2,17 +2,26 @@
 ##################################################
 # Configure bash shell for Docker
 ##################################################
-[[ "$isBashDockerSourced" ]] && return
-isBashDockerSourced=1
+#[[ "$isBashDockerSourced" ]] && return
+#isBashDockerSourced=1
 
 [[ $(type -t docker) ]] || return
 
 set -a # Export all
 
 ## docker image
-alias di='docker image ls'
-alias dit='docker image ls --format "table {{.ID}}\t{{.Repository}}:{{.Tag}}\t{{.Size}}"'
-alias dij='docker image ls --digests --format "{{json .}}" |jq -Mr . --slurp'
+di(){ h="$(docker image ls |head -n1)";echo "$h";docker image ls |grep -v REPOSITORY |sort; }
+dij(){ # as valid JSON
+    [[ $(type -t jq) ]] || {
+        echo '  REQUIREs jq' 
+        return 0
+    }
+    docker image ls --digests --format "{{json .}}" |jq -Mr . --slurp 
+}
+dit(){ # USAGE: dit [--digests]
+    d(){ docker image ls --format "table {{.ID}}\t{{.Repository}}:{{.Tag}}\t{{.Size}}" $@; }
+    h="$( d |head -n1)";echo "$h"; d $@ |grep -v REPOSITORY |sort -t' ' -k2
+}
 drmi(){ # Remove image(s) per substring ($1), else prune 
     [[ "$@" ]] && {
         docker image ls |grep "${@%:*}" |grep "${@#*:}" |gawk '{print $3}' |xargs docker image rm -f
