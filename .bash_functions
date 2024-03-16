@@ -186,6 +186,34 @@ woff2base64() { [[ "$(type -t base64)" && -f "$@" ]] && base64 -w 0 "$@"; }
 
 ip4(){ [[ $1 ]] && ip -4 -brief addr show $1 || ip -4 -brief addr; }
 ip6(){ [[ $1 ]] && ip -6 -brief addr show $1 || ip -6 -brief addr; }
+cidr(){ (ip4 eth0 || ip4 ens192) 2> /dev/null |awk '{print $3}'; }
+scan(){ 
+    case $1 in 
+        "subnet"|"cidr") # Scan subnet (CIDR) for IP addresses in use.
+            [[ $2 ]] && cidr="$2" || cidr="$(cidr)"
+            [[ $cidr ]] || {
+                echo '  Target CIDR not found. Declare it as an argument.'
+                return 0
+            }
+            echo "=== @ CIDR: $cidr"
+            nmap -sn $cidr
+        ;;
+        "ports"|"ip") # Scan IP address for ports in use.
+            [[ $2 ]] && ip="$2" || ip="$(cidr |cut -d/ -f1)"
+            [[ $ip ]] || {
+                echo '  Target IP address not found. Declare it as an argument.'
+                return 0
+            }
+            echo "=== @ IP Address: $ip"
+            seq ${3:-1} ${4:-1024} \
+                |xargs -IX nc -zvw 1 $ip X 2>&1 >/dev/null \
+                |grep -iv fail |grep -iv refused
+        ;;
+        *)
+            echo "  USAGE: $FUNCNAME subnet|ports [CIDR|IP] [minPORT [maxPORT]]"
+        ;;
+    esac
+}
 
 tls(){
     unset artifact
@@ -290,10 +318,13 @@ tls(){
         ;;
         "crt")
             [[ $2 == "verify" ]] && {
+                # Verify the server's ca-signed certificate against the CA that signed it.
                 [[ -f $3 && -f $4 ]] && {
                     artifact=/tmp/tls.crt.verify.${3##*/}.log
                     openssl verify -CAfile $3 $4 |& tee $artifact
                 } || {
+                    # CA_CERT_BUNDLE is path to trust-store file; concatenated CA certificates in PEM format.
+                    # SERVER_CERT is path to server's full-chain certificate AKA certificate-chain file
                     echo "  USAGE: $FUNCNAME crt verify CA_CERT_BUNDLE SERVER_CERT"
                     return 0
                 }
