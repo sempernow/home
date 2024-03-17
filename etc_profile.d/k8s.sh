@@ -25,7 +25,8 @@ unset flag_any_k8s
     source <(kubectl completion bash)
 
     # k + completion
-    alias k=kubectl
+    #alias k=kubectl
+    k(){ kubectl "$@"; }
     complete -o default -F __start_kubectl k
 
     # Get/Set kubectl namespace : Usage: kn [NAMESPACE]
@@ -61,10 +62,12 @@ unset flag_any_k8s
         }
         kubectl get sc
     }
+    # Get all workloads/nodes of current namespace
+    kw(){ kubectl get pod -o wide; }
 
     psk(){ 
-        # ps aux, filtering through only k8s-related processes. 
-        # ARGs: [k8s-command-name(default: all)]
+        # ps aux; all k8s-related processes. 
+        # ARGs: [command(Default: all)]
         k8s='
             containerd
             dockerd
