@@ -199,7 +199,7 @@ isDOS() {
     # ARGs: FILE-PATH
     # stdout: '1' if DOS, null if UNIX
     # companion script: ~/.bin/dos2unix
-    REQUIREs isASCII dos2unix
+    REQUIREs isASCII #dos2unix
     [[ -f "$@" ]] && {
         [[ "$( isASCII "$@" )" ]] || return 0
         #dos2unix < "$@" |cmp -s - "$@"

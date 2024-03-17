@@ -3,16 +3,23 @@
 # Aliases
 
 # Meta
-
 alias os='cat /etc/os-release'
 alias cpu='cat /proc/cpuinfo'
 alias mem='cat /proc/meminfo'
+
+# Apps
 alias vi=vim
 alias python=python3
 alias pip='python3 -m pip'
 [[ $(type -t go) ]] && alias goclean='go clean -i -r -cache -testcache -fuzzcache'
 [[ $(type -t ffmpeg) ]] && alias ffmpeg='ffmpeg -hide_banner'
 [[ $(type -t gpg) ]] && alias gpg=GnuPG
+alias jq='jq -C'
+
+# Scripts
+alias edit=openedit
+alias open=openedit
+alias isdos=isDOS
 
 # FS
 alias ls='ls -hl --color=auto --group-directories-first'
@@ -24,9 +31,6 @@ alias lsblk='lsblk -o SIZE,LABEL,NAME,MAJ:MIN,TYPE,FSTYPE,MOUNTPOINT,UUID'
 alias tree='tree -I vendor --dirsfirst'
 alias copy='cp -up'
 alias update='cp -urpv'
-alias edit=openedit
-alias open=openedit
-alias isdos=isDOS
 
 # Text
 alias cls=clear
@@ -36,7 +40,6 @@ alias grepa='grep -A10'
 alias grepba='grep -B5 -A5'
 # alias egrep='egrep --color=auto'              # show differences in colour
 # alias fgrep='fgrep --color=auto'              # show differences in colour
-alias jq='jq -C'
 alias sha2=sha256
 
 # End here if not bash 
