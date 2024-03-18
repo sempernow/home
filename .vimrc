@@ -9,14 +9,14 @@
 " :help OPTION    @ Get option info while in the vim editor.
 " :set ts=6 sw=2 sts=0 et ai smarttab
 
-function! UseTabs()
+function! Tabs()
   set tabstop=4     " Size of a hard tabstop (ts).
   set shiftwidth=4  " Size of an indentation (sw).
   set noexpandtab   " Always uses tabs instead of space characters (noet).
   set autoindent    " Copy indent from current line when starting a new line (ai).
 endfunction
 
-function! UseSpaces()
+function! Spaces()
   set expandtab                   " Always insert spaces on TAB keypress
   set shiftwidth=4 smarttab       " Insert N spaces per TAB keypress if at start of line
   set tabstop=6 softtabstop=0     " TAB width is N spaces (Distinguish from shiftwidth)
@@ -30,14 +30,14 @@ function! Yaml()
   set autoindent                  " indent line per preceeding line
 endfunction
 
-function! List()
+function! Show()
   set list                               " Show control chars TAB and SPACE
   "set listchars=tab:▸\ ,space:·          " Show TAB as "▸   " and SPACE as"·"
   set listchars=tab:▸\ ,space:·,trail:•  " Show TAB as "▸   ", SPACE as"·", and traling SPACE as "•"
 endfunction
 
-call UseSpaces()
-call List()
+call Spaces()
+call Show()
 
 set clipboard=unnamed           " Set clipboard to unnamed to access system clipboard @ Windows
 set noswapfile                  " Prevent vim's zombie swap-file clusterfuck
