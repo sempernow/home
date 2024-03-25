@@ -34,10 +34,14 @@ unset flag_any_k8s
         [[ "$1" ]] && {
             kubectl config set-context --current --namespace $1
         } || {
-            kubectl config view --minify |grep namespace |cut -d" " -f6
+            [[ $(type -t yq) ]] && {
+                kubectl config view --minify |yq .contexts[].context.namespace
+            } || {
+                kubectl config view --minify |grep namespace |cut -d" " -f6
+            }
         }
     }
-    
+
     # Get/Set kubectl context : Usage: kx [CONTEXT_NAME]
     kx() { 
         [[ "$1" ]] && {
