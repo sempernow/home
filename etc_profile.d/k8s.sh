@@ -66,8 +66,16 @@ unset flag_any_k8s
         }
         kubectl get sc
     }
+
     # Get all workloads/nodes of current namespace
-    kw(){ kubectl get pod -o wide; }
+    kw(){
+        [[ $(type -t yq) ]] && {
+            nodes="$(k get node -o yaml |yq .items[].metadata.name)"
+        } || {
+            nodes="$(k get node -o yaml |grep ' name: ' |cut -d':' -f2)"
+        }
+        printf "%s\n" "$nodes" |xargs -IX /bin/bash -c 'k get pod -o wide |grep $1' _ X
+    }
 
     psk(){ 
         # ps aux; all k8s-related processes. 
