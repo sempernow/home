@@ -1,6 +1,8 @@
 # [`sempernow/home`](https://github.com/sempernow/home "GitHub.com") 
 
->A portable Bash shell configuration that adapts to its environment and has many helpers (aliases, functions, completions, &hellip;), including those for `git`, `docker`, `kubectl` and `helm`.
+A portable Bash shell configuration that adapts to its environment 
+and configures many aliases, completion scripts, and user-defined functions,
+including those for `git`, `docker`, `kubectl` and `helm`.
 
 Tested on:
 
