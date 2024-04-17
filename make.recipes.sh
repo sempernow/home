@@ -43,7 +43,7 @@ user(){
         f=${1##*/};cp -p $1 ${0}/.bashrc_${f%%.*}
     ' $HOME {} \;
     [[ "$HAS_WSL" ]] || rm -f ~/.bashrc_win
-    [[ "$IS_EDN" ]]  || rm -f ~/.bashrc_edn
+    [[ "$IS_SUB" ]]  || rm -f ~/.bashrc_sub
     chmod 0644 ~/.profile
     chmod 0644 ~/.bash*
     chmod 0644 ~/.gitignor*
@@ -62,7 +62,7 @@ _as(){
     # Configure all users as is current user
     id=$1
     HAS_WSL=$2
-    IS_EDN=$3
+    IS_SUB=$3
     git_prompt_dir="${GIT_PROMPT_DIR:-/usr/share/git-core/contrib/completion}"
     rm -f /etc/profile.d/${id}-??-*.sh
     cp ./.bashrc /etc/profile.d/${id}-01-bashrc.sh
@@ -71,7 +71,7 @@ _as(){
         f=${1##*/};cp -p $1 /etc/profile.d/${0}-${f%%.*}.sh
     ' $id {} \;
     [[ "$HAS_WSL" ]] || rm -f /etc/profile.d/${id}-win.sh
-    [[ "$IS_EDN" ]]  || rm -f /etc/profile.d/${id}-sub.sh
+    [[ "$IS_SUB" ]]  || rm -f /etc/profile.d/${id}-sub.sh
     chown root:root /etc/profile.d/${id}-*.sh
     chmod 0644 /etc/profile.d/${id}-*.sh
     mkdir -p /usr/local/bin
@@ -100,11 +100,11 @@ all(){
         return 0
     }
     [[ $hasSudo && "$id" != "0" ]] && {
-        sudo /bin/bash -c "$DECL && _as $id $HAS_WSL $IS_EDN"
+        sudo /bin/bash -c "$DECL && _as $id $HAS_WSL $IS_SUB"
     }
 
     [[ "$id" == "0" ]] && {
-        _as $id $HAS_WSL $IS_EDN
+        _as $id $HAS_WSL $IS_SUB
     } 
     return 0
 }

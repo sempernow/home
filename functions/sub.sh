@@ -1,9 +1,9 @@
 # source /etc/profile.d/sub.sh
 #####################################
-# Configure bash shell @ EDN subnet
+# Configure bash shell @ SUB subnet
 #####################################
-[[ "$isBashEDNSourced" ]] && return
-isBashEDNSourced=1
+[[ "$isBashSUBSourced" ]] && return
+isBashSUBSourced=1
 
 set -a # Export all
 
@@ -74,7 +74,7 @@ wake(){ sudo killall -s SIGUSR1 automount && sudo mount -a; }
 
 # @ Reach-in VM
 [[ $(hostname |grep ONXWQBL) ]] || {
-    printf "\n%s\n" "Hostname(s) of EDN-Provisioned, SSH-configured VM(s)"
+    printf "\n%s\n" "Hostname(s) of SUB-Provisioned, SSH-configured VM(s)"
     cat ~/.ssh/config |grep Host |grep -v Hostname
 }
 

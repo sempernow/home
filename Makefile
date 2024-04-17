@@ -28,7 +28,7 @@ export PRJ_ROOT := $(shell pwd)
 
 export GIT_PROMPT_DIR := /usr/share/git-core/contrib/completion
 export HAS_WSL        := $(shell type -t wsl.exe)
-export IS_EDN         := $(shell echo $$no_proxy |grep bar.com)
+export IS_SUB         := $(shell echo $$no_proxy |grep bar.com)
 
 ##############################################################################
 ## Recipes : Meta
@@ -53,7 +53,7 @@ menu :
 	@echo "push      : git commit … && git push … && git log …"
 
 env :
-	@echo "IS_EDN  : ${IS_EDN}"
+	@echo "IS_SUB  : ${IS_SUB}"
 	@echo "HAS_WSL : ${HAS_WSL}"
 
 sync-user sync :
