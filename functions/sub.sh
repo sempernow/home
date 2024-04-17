@@ -1,4 +1,4 @@
-# source /etc/profile.d/edn.sh
+# source /etc/profile.d/sub.sh
 #####################################
 # Configure bash shell @ EDN subnet
 #####################################
@@ -22,7 +22,7 @@ set -a # Export all
         HTTP_PROXY="$http_proxy"
         HTTPS_PROXY="$https_proxy"
 
-        no_proxy_core_static="localhost,127.0.0.1,192.168.0.0/16,172.16.0.0/16,.entds.ngisn.com,.edn.entds.ngisn.com,.dilmgmt.c4isrt.com,.dil.es.northgrum.com,.ms.northgrum.com,.es.northgrum.com,.northgrum.com"
+        no_proxy_core_static="localhost,127.0.0.1,192.168.0.0/16,172.16.0.0/16,.foo.com,.sub.foo.com,.site.com,.zoo.bar.com,.ms.bar.com,.es.bar.com,.bar.com"
         [[ $no_proxy ]] || no_proxy="$no_proxy_core_static"
         no_proxy_core="${no_proxy}"
         no_proxy_minikube="10.96.0.0/12,192.168.59.0/24,192.168.49.0/24,192.168.39.0/24"
@@ -46,7 +46,7 @@ set -a # Export all
     # Restart minikube if not running, and 
     # reset permissions on all /config.json if user is its owner.
     [[ $(minikube status -o json 2>/dev/null |jq -Mr .Host) != 'Running' ]] && {
-        minikube start && [[ $USER == '4n52626' ]] && mperms
+        minikube start && [[ $USER == '4auser' ]] && mperms
     }
 }
 
@@ -58,7 +58,7 @@ set +a # End export all
 set -a # Export all
 
 [[ $(type -t docker) ]] && {
-    alias registry='echo "docker-ng-untrusted-group.northgrum.com"'
+    alias registry='echo "docker-ng-untrusted-group.bar.com"'
 }
 
 # User shares (NFS/autofs) : Recreate, wake, and set helper functions

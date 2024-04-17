@@ -71,7 +71,7 @@ _as(){
         f=${1##*/};cp -p $1 /etc/profile.d/${0}-${f%%.*}.sh
     ' $id {} \;
     [[ "$HAS_WSL" ]] || rm -f /etc/profile.d/${id}-win.sh
-    [[ "$IS_EDN" ]]  || rm -f /etc/profile.d/${id}-edn.sh
+    [[ "$IS_EDN" ]]  || rm -f /etc/profile.d/${id}-sub.sh
     chown root:root /etc/profile.d/${id}-*.sh
     chmod 0644 /etc/profile.d/${id}-*.sh
     mkdir -p /usr/local/bin
