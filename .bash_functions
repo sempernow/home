@@ -375,6 +375,8 @@ hostfprs() {
 ######
 # Meta
 
+vars(){ declare -p |grep -E 'declare -(x|[a-z]*x)' |awk '{print $3}' |grep -v __git; }
+
 colors() {
     # Each is a background color and contrasting text color.
     # Usage: colors;printf "\n %s\n" "$green MESSAGE $norm"
