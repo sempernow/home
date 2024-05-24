@@ -23,7 +23,7 @@ alias isdos=isDOS
 
 # FS
 alias ls='ls -hl --color=auto --group-directories-first'
-alias ll='ls -AhlrtL --time-style=long-iso' 
+alias ll='ls -AhlnrtL --time-style=long-iso' 
 ll >/dev/null 2>&1 || alias ll='ls -AhlrtL --group-directories-first'
 
 alias df='df -hT'

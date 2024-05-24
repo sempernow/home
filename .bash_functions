@@ -377,6 +377,8 @@ hostfprs() {
 
 vars(){ declare -p |grep -E 'declare -(x|[a-z]*x)' |awk '{print $3}' |grep -v __git; }
 
+#newest(){ find ${1:-.} -type f ! -path '*/.git/*' -printf '%T+ %P\n' |sort -r |head -n 1 |cut -d' ' -f2-; }
+
 colors() {
     # Each is a background color and contrasting text color.
     # Usage: colors;printf "\n %s\n" "$green MESSAGE $norm"
