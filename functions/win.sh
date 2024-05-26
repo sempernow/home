@@ -49,8 +49,8 @@ _ETC_ARCHIVES_FOLDER="${_HOME}/etc.archives"
     # REFs: https://cygwin.com/cygwin-ug-net/using.html#mount-table
     [[ "$OSTYPE" == 'msys' ]] && { _PREFIX=''; } || { _PREFIX=''; }  
     _USERPROFILE="${_PREFIX}${_USERPROFILE}"
-    # @ Cygwin/X-Server
-    #DISPLAY=:0
+    # Fix xclip issues @ WSL/WSL2 : Requires VcXsrv X Server : choco install vcxsrv -y
+    DISPLAY=:0 # @ VcXsrv running
     XAUTHORITY="${_HOME}/.Xauthority"
     XDG_CURRENT_DESKTOP=X-Cygwin
     XDG_MENU_PREFIX=xwin-
@@ -316,8 +316,11 @@ set +a  # END export
     wsl.exe -l -v >p1 &
     [[ $(cat <p1 |tr -d '\000' |grep ${_OS} |awk '{print $NF}' |grep 2) ]] && {
         # Reset only at WSL 2 terminal
-        export DISPLAY=$(grep nameserver /etc/resolv.conf |awk '{print $2}'):0.0
         #export DISPLAY='172.31.16.1:0.0'
+        # @ Win10
+        #export DISPLAY=$(grep nameserver /etc/resolv.conf |awk '{print $2}'):0.0
+        # @ Win11 + VcXsrv running : Fix for xclip @ passgo 
+        DISPLAY=:0 
     }
     rm p1
 }
