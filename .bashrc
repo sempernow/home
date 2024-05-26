@@ -8,9 +8,9 @@ alias cpu='cat /proc/cpuinfo'
 alias mem='cat /proc/meminfo'
 
 # Apps
-alias vi=vim
 alias python=python3
 alias pip='python3 -m pip'
+[[ $(type -t vim) ]] && alias vi=vim
 [[ $(type -t go) ]] && alias goclean='go clean -i -r -cache -testcache -fuzzcache'
 [[ $(type -t ffmpeg) ]] && alias ffmpeg='ffmpeg -hide_banner'
 [[ $(type -t gpg) ]] && alias gpg=GnuPG
@@ -23,7 +23,7 @@ alias isdos=isDOS
 
 # FS
 alias ls='ls -hl --color=auto --group-directories-first'
-alias ll='ls -AhlnrtL --time-style=long-iso' 
+alias ll='ls -AhlnrtL --time-style=long-iso'
 ll >/dev/null 2>&1 || alias ll='ls -AhlrtL --group-directories-first'
 
 alias df='df -hT'
@@ -43,14 +43,15 @@ alias grepba='grep -B5 -A5'
 # alias fgrep='fgrep --color=auto'              # show differences in colour
 alias sha2=sha256
 
-# End here if not bash 
+# End here if not bash
 [[ true ]] || { . ~/.bash_functions; return; }
 
 # Network
 ip -c addr > /dev/null 2>&1 && alias ip='ip -c'
 
 # End here if previously sourced
-[[ "$isBashrcSourced" ]] && return
+#[[ "$BASH_SOURCE" =~ "/etc/profile.d" ]] || [[ "$isBashrcSourced" ]] && return
+#[[ "$BASH_SOURCE" =~ "/etc/profile.d" ]] || [[ "$isBashrcSourced" ]] && return
 isBashrcSourced=1
 
 # Test for GNU Bourne-Again SHell (bash)
@@ -62,7 +63,7 @@ isBashrcSourced=1
 [[ "$isBash" ]] && set +o posix 
 
 # Source global definitions
-[[ -f /etc/bashrc ]] && source /etc/bashrc 
+[[ -f /etc/bashrc ]] && source /etc/bashrc
 
 # User specific environment
 [[ "$PATH" =~ "$HOME/.local/bin:$HOME/bin:" ]] \

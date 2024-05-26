@@ -216,6 +216,7 @@ scan(){
 }
 
 tls(){
+    REQUIREs openssl
     unset artifact
     case $1 in
         "cnf")
