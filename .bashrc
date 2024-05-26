@@ -50,7 +50,9 @@ alias sha2=sha256
 ip -c addr > /dev/null 2>&1 && alias ip='ip -c'
 
 # End here if previously sourced unless from /etc/profile.d/
-[[ "$BASH_SOURCE" =~ "/etc/profile.d" ]] || [[ "$isBashrcSourced" ]] && return
+[[ "$BASH_SOURCE" =~ "/etc/profile.d" ]] || {
+    [[ "$isBashrcSourced" ]] && return
+}
 isBashrcSourced=1
 
 # Test for GNU Bourne-Again SHell (bash)
