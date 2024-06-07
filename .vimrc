@@ -52,8 +52,8 @@ set vb                          " Turn on the 'visual bell'; much quieter than '
 set ruler                       " Show the cursor position all the time
 set laststatus=2                " Make last line (status) two lines deep, so always visible
 set backspace=indent,eol,start  " Make the backspace key work the way it should
-"set background=dark             " Default to colours that work well on dark background
-colo delek                      " Color scheme
+"set background=dark            " Default to colours that work well on dark background
+colo darkblue                   " Color scheme
 set showmode                    " Show the current mode
 syntax on                       " Turn syntax highlighting on by default
 xnoremap p pgvy                 " Paste repeatedly"

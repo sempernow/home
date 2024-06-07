@@ -24,7 +24,7 @@ gbd(){
 gc(){ # commit -m [MSG]
     [[ -d ./.git ]] || git init
     [[ "$@" ]] && _m="$@" || { REQUIREs newest; _m="$( newest )"; _m="${_m##*/} @ $(date -u '+%Y-%m-%dT%H:%M:%SZ')"; }
-    git add . ; git commit -m "$_m" ; gl
+    git add -u ; git commit -m "$_m" ; gl
 }
 gch(){ # checkout [-b NEW]
     [[ "$@" ]] && _b="$@" || { _b="$(date '+%H.%M.%S')"; _b="${_b:0:5}"; }
