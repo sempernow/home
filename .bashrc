@@ -10,20 +10,21 @@ alias mem='cat /proc/meminfo'
 # Apps
 alias python=python3
 alias pip='python3 -m pip'
-[[ $(type -t vim) ]] && alias vi=vim
-[[ $(type -t go) ]] && alias goclean='go clean -i -r -cache -testcache -fuzzcache'
+[[ $(type -t vim) ]]    && alias vi=vim
+[[ $(type -t go) ]]     && alias goclean='go clean -i -r -cache -testcache -fuzzcache'
 [[ $(type -t ffmpeg) ]] && alias ffmpeg='ffmpeg -hide_banner'
-[[ $(type -t gpg) ]] && alias gpg=GnuPG
-alias jq='jq -C'
+[[ $(type -t gpg) ]]    && alias gpg=GnuPG
+[[ $(type -t jq) ]]     && alias jq='jq -C'
 
 # Scripts
-alias edit=openedit
-alias open=openedit
+[[ $(type -t openedit) ]] && alias edit=openedit
+[[ $(type -t openedit) ]] && alias open=openedit
 alias isdos=isDOS
 
 # FS
 alias ls='ls -hl --color=auto --group-directories-first'
 alias ll='ls -AhlnrtL --time-style=long-iso'
+# Because some utilities of some distros (busybox) lack some flags:
 ll >/dev/null 2>&1 || alias ll='ls -AhlrtL --group-directories-first'
 
 alias df='df -hT'
@@ -36,8 +37,8 @@ alias update='cp -urpv'
 # Text
 alias cls=clear
 alias grep='grep --color'                       # show differences in colour
-alias grepb='grep -B10'
-alias grepa='grep -A10'
+alias grepb='grep -B5'
+alias grepa='grep -A5'
 alias grepba='grep -B5 -A5'
 # alias egrep='egrep --color=auto'              # show differences in colour
 # alias fgrep='fgrep --color=auto'              # show differences in colour
@@ -70,7 +71,13 @@ isBashrcSourced=1
 [[ "$PATH" =~ "$HOME/.local/bin:$HOME/bin:" ]] \
     || PATH="$HOME/.local/bin:$HOME/bin:$PATH"
 
-# History Options
+# Golang
+[[ $(type -t go) ]] && {
+    GOROOT=/usr/local/go1.22.2
+    PATH=$GOROOT/bin:$PATH
+}
+
+# History (history) Options
 #
 # Ignore duplicates and statements starting with space(s)
 export HISTCONTROL=ignoreboth
