@@ -8,7 +8,7 @@
 
 set -a  # EXPORT ALL ...
 
-[[ "$_PID_1xSHELL" ]] || _PID_1xSHELL=$( ps |grep 'bash' |sort -k 7 |awk '{print $1;}' |head -n 1 )
+[[ "$_PID_1xSHELL" ]] || _PID_1xSHELL=$(ps |grep 'bash' |sort -k 7 |awk '{print $1;}' |head -n 1)
 
 ######
 # Date
