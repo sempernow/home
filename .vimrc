@@ -32,8 +32,11 @@ endfunction
 
 function! Show()
   set list                               " Show control chars TAB and SPACE
-  "set listchars=tab:▸\ ,space:·          " Show TAB as "▸   " and SPACE as"·"
-  set listchars=tab:▸\ ,space:·,trail:•  " Show TAB as "▸   ", SPACE as"·", and traling SPACE as "•"
+  set listchars=tab:▸\ ,space:·,trail:•  " Show TAB as "▸   " (\u25b8), SPACE as "·" (\u00b7), traling SPACE as "•" (\u2022)
+endfunction
+
+function! Noshow()
+  set nolist
 endfunction
 
 call Spaces()
