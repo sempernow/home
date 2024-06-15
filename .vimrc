@@ -33,7 +33,7 @@ endfunction
 
 function! List()
   set list                               " List (show) control chars TAB and SPACE
-  set listchars=tab:▸\ ,space:·,trail:•  " TAB as "▸   " (U+25b8), SPACE as "·" (U+00b7), traling SPACE as "•" (U+2022)
+  set listchars=tab:▸\ ,space:·,trail:•  " TAB as '▸    ' (U+25b8), SPACE as '·' (U+00b7), traling SPACE as '•' (U+2022)
 endfunction
 
 function! Nolist()
@@ -65,9 +65,9 @@ xnoremap p pgvy                 " Paste repeatedly
 " Show EOL type and last modified timestamp, right after the filename
 set statusline=%<%F%h%m%r\ [%{&ff}]\ (%{strftime(\"%H:%M\ %d/%m/%Y\",getftime(expand(\"%:p\")))})%=%l,%c%V\ %P
 
-"@ fatah/vim-go"
+"@ fatah/vim-go
 filetype plugin indent on
 
-" YAML
+" YAML untested:
 " autocmd FileType yaml setlocal ai ts=2 sw=2 et
 

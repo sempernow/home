@@ -29,6 +29,7 @@ todaynow(){
     t="$(date +%F_%H.%M.%S)";echo "$t"
     #[[ ! "$1" ]] && { [[ $(type -t putclip) ]] && putclip "$t"; }
 }
+
 utc(){
     # YYY-MM-DDTHH.mm.ss
     t="$(date '+%Y-%m-%dT%H:%M:%S')";echo "$t"
@@ -40,12 +41,19 @@ utco(){
     #[[ ! "$1" ]] && { [[ $(type -t putclip) ]] && putclip "$t"; }
 }
 gmt(){
-    # YYY-MM-DDTHH.mm.ssZ  : Appends "Z" for Zero offset AKA "Zulu time" by US military's phonetic alpahabet
+    # YYY-MM-DDTHH.mm.ssZ  : Appends "Z" for Zero offset AKA Zulu (See military phonetic alpahabet)
     t="$(date -u '+%Y-%m-%dT%H:%M:%SZ')";echo "$t"
     #[[ ! "$1" ]] && { [[ $(type -t putclip) ]] && putclip "$t"; }
 }
+gmto(){
+    # YYY-MM-DDTHH.mm.ss-HHHH.TZ  
+    t="$(date -u '+%Y-%m-%dT%H:%M:%SZ.%Z')";echo "$t"
+    #[[ ! "$1" ]] && { [[ $(type -t putclip) ]] && putclip "$t"; }
+}
+
 alias zulu=gmt
 alias utcz=gmt
+
 iso(){
     # YYY-MM-DDTHH.mm.ss+/-HH:mm
     t="$(date --iso-8601=seconds)";echo "$t"
@@ -60,7 +68,6 @@ isoz(){
 ####
 # FS
 
-ug(){ printf "$(id -u):$(id -g)"; }
 path() {
     # Parse and print $PATH
     clear ; echo ; echo '  $PATH (parsed)'; echo
@@ -133,8 +140,9 @@ journal(){ # -e : Jump to end, --no-pager : Show full message (else each is trun
 }
 
 #######
-# Utils
+# Other
 
+ug(){ printf "$(id -u):$(id -g)"; }
 grepall(){ [[ "$@" ]] && find . -type f -exec grep -il  "$@" "{}" \+ ; }
 randa(){
     # ARGs: [LENGTH(Default:32]
@@ -184,12 +192,16 @@ woff2base64() { [[ "$(type -t base64)" && -f "$@" ]] && base64 -w 0 "$@"; }
 #########
 # Network
 
-ip4(){ [[ $1 ]] && ip -4 -brief addr show $1 || ip -4 -brief addr; }
-ip6(){ [[ $1 ]] && ip -6 -brief addr show $1 || ip -6 -brief addr; }
-cidr(){ (ip4 eth0 || ip4 ens192) 2> /dev/null |awk '{print $3}'; }
-scan(){ 
+ip4(){ ip -4 -brief addr "$@" |sed -r 's/[[:cntrl:]]\[[0-9]{1,3}m//g'; }
+ip6(){ ip -6 -brief addr "$@" |sed -r 's/[[:cntrl:]]\[[0-9]{1,3}m//g'; }
+cidr(){
+    (ip4 show dev eth0 || ip4 show dev ens192 || ip4 show dev ens33) 2> /dev/null \
+        |awk '{print $3}' |sed -r 's/[[:cntrl:]]\[[0-9]{1,3}m//g'
+}
+scan(){
     case $1 in 
         "subnet"|"cidr") # Scan subnet (CIDR) for IP addresses in use.
+            REQUIREs nmap || return
             [[ $2 ]] && cidr="$2" || cidr="$(cidr)"
             [[ $cidr ]] || {
                 echo '  Target CIDR not found. Declare it as an argument.'
@@ -205,6 +217,7 @@ scan(){
                 return 0
             }
             echo "=== @ IP Address: $ip"
+            REQUIREs nc || return
             seq ${3:-1} ${4:-1024} \
                 |xargs -IX nc -zvw 1 $ip X 2>&1 >/dev/null \
                 |grep -iv fail |grep -iv refused
@@ -216,7 +229,7 @@ scan(){
 }
 
 tls(){
-    REQUIREs openssl
+    REQUIREs openssl || return 
     unset artifact
     case $1 in
         "cnf")
