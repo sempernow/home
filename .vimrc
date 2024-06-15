@@ -7,40 +7,41 @@
 " /etc/vimrc      @ Git for Windows.
 " :set OPTION     @ Set any option while in the vim editor.
 " :help OPTION    @ Get option info while in the vim editor.
+
 " :set ts=6 sw=2 sts=0 et ai smarttab
 
-function! Tabs()
+function! Tabs()    " 4 whitespaces equivalent
   set tabstop=4     " Size of a hard tabstop (ts).
   set shiftwidth=4  " Size of an indentation (sw).
   set noexpandtab   " Always uses tabs instead of space characters (noet).
   set autoindent    " Copy indent from current line when starting a new line (ai).
 endfunction
 
-function! Spaces()
+function! Spaces()                " 4 whitespaces
   set expandtab                   " Always insert spaces on TAB keypress
   set shiftwidth=4 smarttab       " Insert N spaces per TAB keypress if at start of line
-  set tabstop=6 softtabstop=0     " TAB width is N spaces (Distinguish from shiftwidth)
+  set tabstop=6 softtabstop=0     " TAB width differs to distinguish from whitespace indent
   set autoindent                  " indent line per preceeding line
 endfunction
 
-function! Yaml()
+function! Yaml()                  " 2 whitespaces
   set expandtab                   " Always insert spaces on TAB keypress
   set shiftwidth=2 smarttab       " Insert N spaces per TAB keypress if at start of line
-  set tabstop=6 softtabstop=0     " TAB width is N spaces (Distinguish from shiftwidth)
+  set tabstop=6 softtabstop=0     " TAB width differs to distinguish from whitespace indent
   set autoindent                  " indent line per preceeding line
 endfunction
 
-function! Show()
-  set list                               " Show control chars TAB and SPACE
-  set listchars=tab:▸\ ,space:·,trail:•  " Show TAB as "▸   " (\u25b8), SPACE as "·" (\u00b7), traling SPACE as "•" (\u2022)
+function! List()
+  set list                               " List (show) control chars TAB and SPACE
+  set listchars=tab:▸\ ,space:·,trail:•  " TAB as "▸   " (U+25b8), SPACE as "·" (U+00b7), traling SPACE as "•" (U+2022)
 endfunction
 
-function! Noshow()
+function! Nolist()
   set nolist
 endfunction
 
 call Spaces()
-call Show()
+call List()
 
 set clipboard=unnamed           " Set clipboard to unnamed to access system clipboard @ Windows
 set noswapfile                  " Prevent vim's zombie swap-file clusterfuck
@@ -59,7 +60,7 @@ set backspace=indent,eol,start  " Make the backspace key work the way it should
 colo darkblue                   " Color scheme
 set showmode                    " Show the current mode
 syntax on                       " Turn syntax highlighting on by default
-xnoremap p pgvy                 " Paste repeatedly"
+xnoremap p pgvy                 " Paste repeatedly
 
 " Show EOL type and last modified timestamp, right after the filename
 set statusline=%<%F%h%m%r\ [%{&ff}]\ (%{strftime(\"%H:%M\ %d/%m/%Y\",getftime(expand(\"%:p\")))})%=%l,%c%V\ %P
