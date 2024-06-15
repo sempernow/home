@@ -44,7 +44,7 @@ menu :
 	@echo "ubox      : docker run -d … ubuntu …"
 	@echo "bbox      : docker run -d … busybox …"
 	@echo "abox      : docker run -d … alpine …"
-	@echo "rbox      : docker run -d … almalinux …"
+	@echo "rbox      : docker run -d … redhat …"
 
 	$(INFO) 'Meta'
 	@echo "html      : Process markdown (.md) into markup (.html)"
@@ -69,16 +69,16 @@ all : perms sync-all
 	bash make.recipes.sh all
 
 ubox :
-	docker run --rm -d --name ubox -v ${PRJ_ROOT}:/root -w /root ubuntu sleep 1d 
+	docker run --rm -d --name ubox -v ${PRJ_ROOT}:/root -w /root ubuntu sleep 1d
 
 bbox :
-	docker run --rm -d --name bbox -v ${PRJ_ROOT}:/root -w /root busybox sleep 1d 
+	docker run --rm -d --name bbox -v ${PRJ_ROOT}:/root -w /root busybox sleep 1d
 
 abox :
-	docker run --rm -d --name abox -v ${PRJ_ROOT}:/root -w /root alpine sleep 1d 
+	docker run --rm -d --name abox -v ${PRJ_ROOT}:/root -w /root alpine sleep 1d
 
 rbox :
-	docker run --rm -d --name rbox -v ${PRJ_ROOT}:/root -w /root almalinux:8 sleep 1d 
+	docker run --rm -d --name rbox -v ${PRJ_ROOT}:/root -w /root redhat/ubi9 sleep 1d
 
 html : md2html perms
 
