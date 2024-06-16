@@ -17,9 +17,10 @@ function! Tabs()    " 4 whitespaces equivalent
   set autoindent    " Copy indent from current line when starting a new line (ai).
 endfunction
 
-function! Spaces()                " 4 whitespaces
+function! Spaces(n = 4)           " N whitespaces (default: 4)
   set expandtab                   " Always insert spaces on TAB keypress
-  set shiftwidth=4 smarttab       " Insert N spaces per TAB keypress if at start of line
+  " Insert N spaces per TAB keypress if at start of line
+  execute 'set shiftwidth=' . a:n . ' smarttab'
   set tabstop=6 softtabstop=0     " TAB width differs to distinguish from whitespace indent
   set autoindent                  " indent line per preceeding line
 endfunction
