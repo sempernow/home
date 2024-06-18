@@ -7,7 +7,9 @@
 " /etc/vimrc      @ Git for Windows.
 " :set OPTION     @ Set any option while in the vim editor.
 " :help OPTION    @ Get option info while in the vim editor.
-
+"
+" set nocompatible  " Disable vi compatibility mode. SET FIRST
+"
 " :set ts=6 sw=2 sts=0 et ai smarttab
 
 function! Tabs()    " 4 whitespaces equivalent
@@ -48,6 +50,7 @@ set clipboard=unnamed           " Set clipboard to unnamed to access system clip
 set noswapfile                  " Prevent vim's zombie swap-file clusterfuck
 set ignorecase                  " Case insensitive search
 set smartcase                   " Case insensitive search if capital letters
+set nowrap                      " Don't wrap text
 set number                      " Display line numbers
 "set nonumber                    " Do not display line numbers
 set wildmenu                    " Better command-line completion
