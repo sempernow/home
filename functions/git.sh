@@ -28,8 +28,8 @@ gc(){ # commit -m [MSG]
     }
     export -f newest
     [[ -d ./.git ]] || git init
-    [[ "$@" ]] && _m="$@" || { REQUIREs newest; _m="$( newest )"; _m="${_m##*/} @ $(date -u '+%Y-%m-%dT%H:%MZ')"; }
-    git add .;git add -u ; git commit -m "$_m" ; gl
+    [[ "$@" ]] && _m="$@" || _m="$(newest)"
+    git add .;git add -u;git commit -m "$_m";gl
 }
 gch(){ # checkout [-b NEW]
     [[ "$@" ]] && _b="$@" || { _b="$(date '+%H.%M.%S')"; _b="${_b:0:5}"; }
