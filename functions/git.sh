@@ -22,8 +22,13 @@ gbd(){
     git push origin --delete $1     # Remote
 }
 gc(){ # commit -m [MSG]
+    newest(){
+        TZ=Zulu find . -type f ! -path '*/.git/*' -printf '%T+ %P @ %TY-%Tm-%TdT%TH:%TMZ\n' \
+            |sort -r |head -n 1 |cut -d' ' -f2-
+    }
+    export -f newest
     [[ -d ./.git ]] || git init
-    [[ "$@" ]] && _m="$@" || { REQUIREs newest; _m="$( newest )"; _m="${_m##*/} @ $(date -u '+%Y-%m-%dT%H:%M:%SZ')"; }
+    [[ "$@" ]] && _m="$@" || { REQUIREs newest; _m="$( newest )"; _m="${_m##*/} @ $(date -u '+%Y-%m-%dT%H:%MZ')"; }
     git add .;git add -u ; git commit -m "$_m" ; gl
 }
 gch(){ # checkout [-b NEW]
