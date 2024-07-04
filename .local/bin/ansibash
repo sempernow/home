@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-export ANSIBASH_VERSION='0.2.5'
+export ANSIBASH_VERSION='0.2.6'
 
 _ansibash(){
 
@@ -60,19 +60,16 @@ _ansibash(){
         conn=$(ssh_user $vm)@$vm
         echo "=== $conn : $1 $2 $3 $more"
         ssh $conn logger "ansibash : FROM: $(id -un)@$(hostname) TO: $conn"
-        [[ $mode == '-x' ]] && ssh $conn "$@"
-        [[ $mode == '-c' ]] && ssh $conn /bin/bash -c "$@"
+        [[ $mode == '-x' ]] && ssh $conn "$@"  && continue
+        [[ $mode == '-c' ]] && ssh $conn /bin/bash -c "$@" && continue
         [[ $mode == '-s' ]] && {
             # Must list each positional param else may error: "ambiguous redirect"
-            ssh -T $conn /bin/bash -s < $1 $2 $3 $4 $5 $6 $7 $8 $9
+            ssh -T $conn /bin/bash -s < $1 $2 $3 $4 $5 $6 $7 $8 $9 && continue
         }
-        [[ $mode == '-u' ]] && scp -pr "$1" $conn:$target
-        [[ $mode == '-d' ]] && scp -pr "$conn:$1" "${2:-.}/${vm}_${1##*/}"
+        [[ $mode == '-u' ]] && scp -pr "$1" $conn:$target && continue
+        [[ $mode == '-d' ]] && scp -pr "$conn:$1" "${2:-.}/${vm}_${1##*/}" && continue
         ## TODO : Add and prefer rsync method(s) to handle push/pull.
-        echo ''
     done
-
-    return 0
 }
 
  [[ "$1" == 'version' ]] && {
@@ -81,4 +78,8 @@ _ansibash(){
  }
 
 _ansibash "$@"
+code=$?
+(( $code )) && echo  "ERROR: $code"
+exit $code
+
 
