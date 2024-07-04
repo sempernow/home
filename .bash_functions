@@ -75,12 +75,9 @@ path() {
 }
 [[ $(type -t pushd) ]] && {
     push() {
-        # ARGs: DIR-(REL)PATH || DRIVE-LETTER
-        [[ "$@" ]] || { echo " NO push (no param)"; return 99; }
-        [[ -d "$*" ]] && { pushd "$*" > /dev/null 2>&1 ; return; } || {
-            (( ${#1} == 1 )) && { push "$1"; return; }
-        }
-        echo "=== DIR '$*' NOT EXIST"
+        [[ "$@" ]] || { echo "===  REQUIREs 1 argument : folder path (abs|rel)"; return 99; }
+        [[ -d "$*" ]] && { pushd "$*" > /dev/null 2>&1;return; }
+        echo "=== Folder '$*' NOT EXIST"
     }
     pop() { popd > /dev/null 2>&1 ; }
     up(){ push "$(cd ..;pwd)" ; }
@@ -133,17 +130,18 @@ selinux(){
 #########
 # systemd
 units(){ systemctl list-unit-files; }
-journal(){ # -e : Jump to end, --no-pager : Show full message (else each is truncated).
-    [[ $2 ]] && { sudo journalctl --no-pager -e $@; return 0; }
-    [[ $1 ]] && sudo journalctl --no-pager -e -u $@
-    [[ $1 ]] || sudo journalctl --no-pager -xe
+journal(){ # -e : Jump to end, --no-pager : Show full message (truncated by default), -u : Unit file (service).
+    [[ $2 ]] && { sudo journalctl --no-pager -e "$@"; return; }
+    [[ $1 ]] && sudo journalctl --no-pager -e -u "$@" || sudo journalctl --no-pager -xe "$@"
 }
 
 #######
 # Other
 
+# Current USER:GROUP
 ug(){ printf "$(id -u):$(id -g)"; }
-grepall(){ [[ "$@" ]] && find . -type f -exec grep -il  "$@" "{}" \+ ; }
+# Find all files hereunder containing pattern ($1)
+grepall(){ [[ "$1" ]] && find . -type f -exec grep -il "$1" "{}" \+ ; }
 randa(){
     # ARGs: [LENGTH(Default:32]
     cat /dev/urandom |tr -dc 'a-zA-Z0-9' |fold -w ${1:-32} |head -n 1
@@ -192,38 +190,58 @@ woff2base64() { [[ "$(type -t base64)" && -f "$@" ]] && base64 -w 0 "$@"; }
 #########
 # Network
 
-ip4(){ ip -4 -brief addr "$@" |sed -r 's/[[:cntrl:]]\[[0-9]{1,3}m//g'; }
-ip6(){ ip -6 -brief addr "$@" |sed -r 's/[[:cntrl:]]\[[0-9]{1,3}m//g'; }
 cidr(){
-    (ip4 show dev eth0 || ip4 show dev ens192 || ip4 show dev ens33) 2> /dev/null \
-        |awk '{print $3}' |sed -r 's/[[:cntrl:]]\[[0-9]{1,3}m//g'
+    ip -4 -brief addr "$@" \
+        |sed -r 's/[[:cntrl:]]\[[0-9]{1,3}m//g' \
+        |grep -v lo \
+        |grep UP \
+        |head -n1 \
+        |awk '{print $3}'
 }
+alias cidr4=cidr
+cidr6(){
+    ip -6 -brief addr "$@" \
+        |sed -r 's/[[:cntrl:]]\[[0-9]{1,3}m//g' \
+        |grep -v lo \
+        |grep UP \
+        |head -n1 \
+        |awk '{print $3}'
+}
+ip4(){ cidr4 |cut -d'/' -f1; }
+ip6(){ cidr6 |cut -d'/' -f1; }
+link(){ ip -brief link |grep -v -e lo -e docker |grep UP |cut -d' ' -f1; }
 scan(){
     case $1 in 
         "subnet"|"cidr") # Scan subnet (CIDR) for IP addresses in use.
-            REQUIREs nmap || return
             [[ $2 ]] && cidr="$2" || cidr="$(cidr)"
             [[ $cidr ]] || {
-                echo '  Target CIDR not found. Declare it as an argument.'
-                return 0
+                [[ $(type -t errMSG) ]] && errMSG '  CIDR not found.'
+                return 1
             }
-            echo "=== @ CIDR: $cidr"
-            nmap -sn $cidr
+            echo "=== Hosts in subnet $cidr"
+            REQUIREs arp-scan && sudo arp-scan $cidr \
+            || REQUIREs nmap && nmap -sn $cidr
+
+            return $?
         ;;
         "ports"|"ip") # Scan IP address for ports in use.
             [[ $2 ]] && ip="$2" || ip="$(cidr |cut -d/ -f1)"
             [[ $ip ]] || {
-                echo '  Target IP address not found. Declare it as an argument.'
-                return 0
+                REQUIREs errMSG && errMSG '  IP address not found.'
+                return 1
             }
-            echo "=== @ IP Address: $ip"
+            echo "=== Ports in use at $ip"
             REQUIREs nc || return
             seq ${3:-1} ${4:-1024} \
                 |xargs -IX nc -zvw 1 $ip X 2>&1 >/dev/null \
                 |grep -iv fail |grep -iv refused
         ;;
         *)
-            echo "  USAGE: $FUNCNAME subnet|ports [CIDR|IP] [minPORT [maxPORT]]"
+            echo "  USAGE: 
+              $FUNCNAME subnet|cidr [CIDR($(cidr))]
+              $FUNCNAME ports|ip [IP_ADDR($(ip4))] [minPORT(1) [maxPORT(1024)]]
+            "
+            return 1
         ;;
     esac
 }
@@ -422,16 +440,16 @@ errMSG() {
 REQUIREs(){
     # ARGs: FUNCNAME1 [FUNCNAME2 ...]
     # function[s] exist test; exit on fail; $? is 86 on fail, else 0
-    declare flag
+    declare list
     for func in "$@"
-    do  # exist-test ; append flag on fail
-        [[ "$( type -t $func )" ]] || flag="${flag}'${func}', "
+    do  # exist-test ; append list on fail
+        [[ "$( type -t $func )" ]] || list="${list}'${func}', "
     done
-    [[ "$flag" ]] && { # inform of calling-function and non-existent functions
-        flag="${flag%,*}" ; errMSG "'${FUNCNAME[1]}' REQUIREs function[s] that do NOT EXIST ..."
-        printf '\n %s\n' "$flag"
+    [[ "$list" ]] && { # inform of calling-function and non-existent functions
+        list="${list%,*}" ; errMSG "'${FUNCNAME[1]}' REQUIREs function[s] that do NOT EXIST ..."
+        printf '\n %s\n' "$list"
         # return|exit [86] on fail per @ 1x-bash or not
-        #[[ $PPID -eq $_PID_1xSHELL ]] && return 86 || exit 86 # nope; pppppids are a clusterfuck
+        #[[ $PPID -eq $_PID_1xSHELL ]] && return 86 || exit 86 # failing
         return 86
     }
     return 0
