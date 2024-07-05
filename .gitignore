@@ -28,6 +28,7 @@ app/sidecar/sc1/sc1
 !.*
 !Makefile
 !Makefile.settings
+!UNLICENSE
 
 # Whitelist per file type
 !*.conf
