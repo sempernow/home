@@ -68,7 +68,8 @@ isoz(){
 ####
 # FS
 
-path() {
+dft(){ df -hT |grep -e Type -e ${1:-ext4}; }
+path(){
     # Parse and print $PATH
     clear ; echo ; echo '  $PATH (parsed)'; echo
     declare IFS=: ; printf '  %s\n' $PATH
