@@ -51,8 +51,9 @@ gmto(){
     #[[ ! "$1" ]] && { [[ $(type -t putclip) ]] && putclip "$t"; }
 }
 
-alias zulu=gmt
-alias utcz=gmt
+# Bash alias is not available at SSH session
+zulu(){ gmt "$@"; ]
+utcz(){ gmt "$@"; ]
 
 iso(){
     # YYY-MM-DDTHH.mm.ss+/-HH:mm
@@ -97,7 +98,7 @@ mode(){
     echo ''
     find "$d" -maxdepth 1 -type f -execdir stat --format="  %04a  %A  %n" {} \+ |sed 's/\.\///'
 }
-alias perms=mode
+alias perms=mode # Depricated
 owner(){
     # owner[uid] group[gid] perms[octal] fname
     # ARGs: [path(Default:.)]
@@ -389,15 +390,15 @@ tls(){
 #####
 # ssh
 
-alias fpr='ssh-keygen -E md5 -lvf'
-alias fprs='ssh-keygen -lvf'
+fpr(){ ssh-keygen -E md5 -lvf; }
+fprs(){ ssh-keygen -lvf; }
 hostfprs() {
     # Scan host and show fingerprints of its keys to mitigate MITM attacks.
     # Use against host's claimed fingerprint on ssh-copy-id or other 1st connect.
     [[ "$1" ]] && {
         ssh-keyscan $1 2>/dev/null |ssh-keygen -lf -
     } || {
-        printf "\n%s\n" 'Usage:'
+        printf "\n%s\n" 'USAGE:'
         echo "$FUNCNAME \$host (FQDN or IP address)"
     }
     printf "\n%s\n" 'Push key to host:'
@@ -407,7 +408,12 @@ hostfprs() {
 ######
 # Meta
 
+# Print environment variables sans functions
 vars(){ declare -p |grep -E 'declare -(x|[a-z]*x)' |awk '{print $3}' |grep -v __git; }
+#envsans(){
+#    declare -p |grep -E '^declare -x [^=]+=' |sed 's,",,g' |awk '{print $3}'
+#    printf "\n\t(%s)\n" 'Environment variables containing special characters may not have printed accurately.'
+#}
 
 #newest(){ find ${1:-.} -type f ! -path '*/.git/*' -printf '%T+ %P\n' |sort -r |head -n 1 |cut -d' ' -f2-; }
 
@@ -479,11 +485,11 @@ putclip() {
     }
 }
 x(){
-    # Exit shell; show post-exist shell lvl;
-    # clear user history if @ 1st shell
-    clear #; shlvl
+    # Exit shell
+    # ARGs: [ANY(to clear history and ssh-agent)]
+    clear
     [[ "$BASHPID" == "$_PID_1xSHELL" ]] && {
-        history -c; echo > "$_HOME/.bash_history" # clear history
+        [[ $1 ]] && history -c && echo > "$_HOME/.bash_history" # clear history
         github ssh kill # kill all ssh-agent processes
     }
     exit > /dev/null 2>&1
@@ -494,11 +500,6 @@ shlvl(){
     colors; [[ "$@" ]] && _msg=": $@" || unset _msg
     [[ "${FUNCNAME[1]}" == 'x' ]] && _shlvl=$(( $SHLVL - 1 )) || _shlvl=$SHLVL
     [[ "$_shlvl" == "1" ]] && [[ "$PPID" == "$_PID_1xSHELL" ]] && { printf "\n %s\n" "$red $(( $_shlvl ))x ${SHELL##*/} $norm $_msg" ; } || { printf "\n %s\n" "$(( $_shlvl ))x ${SHELL##*/} $_msg" ; }
-}
-envsans(){
-    # Print environment variables without functions
-    declare -p |grep -E '^declare -x [^=]+=' |sed 's,",,g' |awk '{print $3}'
-    printf "\n\t(%s)\n" 'Environment variables containing special characters may not have printed accurately.'
 }
 
 set +a  # END export
