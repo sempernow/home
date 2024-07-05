@@ -35,8 +35,9 @@ export IS_SUB         := $(shell echo $$no_proxy |grep bar.com)
 
 menu :
 	$(INFO) 'Install'
-	@echo "sync-user : Sync .local/bin with ~/.local/bin"
-	@echo "sync-all  : Sync .local/bin with /usr/local/bin"
+	@echo "sync      : Sync .local/bin of PWD with …"
+	@echo "  *-user  : Sync with ~/.local/bin"
+	@echo "  *-all   : Sync with /usr/local/bin"
 	@echo "user      : Configure bash shell for current user (${USER})."
 	@echo "all       : Configure bash shell for all users."
 	
@@ -45,7 +46,7 @@ menu :
 	@echo "bbox      : docker run -d … busybox …"
 	@echo "abox      : docker run -d … alpine …"
 	@echo "rbox      : docker run -d … redhat …"
-
+	
 	$(INFO) 'Meta'
 	@echo "html      : Process markdown (.md) into markup (.html)"
 	@echo "perms     : find . -type f … -exec chmod …"
@@ -56,9 +57,9 @@ env :
 	@echo "IS_SUB  : ${IS_SUB}"
 	@echo "HAS_WSL : ${HAS_WSL}"
 
-sync-user sync :
+sync : sync-user sync-all
+sync-user :
 	bash make.recipes.sh sync_bins_user
-
 sync-all :
 	bash make.recipes.sh sync_bins_all
 
