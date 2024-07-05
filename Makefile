@@ -28,15 +28,15 @@ export PRJ_ROOT := $(shell pwd)
 
 export GIT_PROMPT_DIR := /usr/share/git-core/contrib/completion
 export HAS_WSL        := $(shell type -t wsl.exe)
-export IS_SUB         := $(shell echo $$no_proxy |grep bar.com)
+#export IS_SUB         := $(shell echo $$no_proxy |grep bar.com)
 
 ##############################################################################
 ## Recipes : Meta
 
 menu :
 	$(INFO) 'Install'
-	@echo "sync      : Sync .local/bin of PWD with …"
-	@echo "  *-user  : Sync with ~/.local/bin"
+	@echo "sync      : Sync .local/bin of PWD with … (both)"
+	@echo "  *-user  : Sync with ${HOME}/.local/bin"
 	@echo "  *-all   : Sync with /usr/local/bin"
 	@echo "user      : Configure bash shell for current user (${USER})."
 	@echo "all       : Configure bash shell for all users."
@@ -54,8 +54,11 @@ menu :
 	@echo "push      : git commit … && git push … && git log …"
 
 env :
-	@echo "IS_SUB  : ${IS_SUB}"
-	@echo "HAS_WSL : ${HAS_WSL}"
+	@echo "PRJ_ROOT       : ${PRJ_ROOT}"
+	@echo "HAS_WSL        : ${HAS_WSL}"
+	@echo "GIT_PROMPT_DIR : ${GIT_PROMPT_DIR}"
+#	@echo "IS_SUB         : ${IS_SUB}"
+	@echo "HOME           : ${HOME}"
 
 sync : sync-user sync-all
 sync-user :
