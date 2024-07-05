@@ -392,7 +392,7 @@ tls(){
 unalias fpr 2>/dev/null
 fpr(){ ssh-keygen -E sha256 -lf "$@"; }
 unalias fprs 2>/dev/null
-fprs(){ ssh-keygen -lvf "$@"; }
+fprs(){ ssh-keygen -lf "$@"; }
 hostfprs(){
     # Scan host and show fingerprints of its keys to mitigate MITM attacks.
     # Use against host's claimed fingerprint on ssh-copy-id or other 1st connect.
