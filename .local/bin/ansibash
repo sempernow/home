@@ -74,7 +74,7 @@ _ansibash(){
         conn=$(ssh_user $vm)@$vm
         [[ $ANSIBASH_VERBOSE ]] && echo "=== $conn : $1 $2 $3 $more" || echo "=== $conn"
         ssh $conn logger "ansibash : FROM: $(id -un)@$(hostname) TO: $conn"
-        [[ $mode == '-x' ]] && { ssh $conn "$@" && continue || return 1; }
+        [[ $mode == '-x' ]] && { ssh $conn "$@";continue; }
         [[ $mode == '-c' ]] && { ssh $conn /bin/bash -c "$@" && continue || return 1; }
         [[ $mode == '-s' ]] && {
             # Must list each positional param else may fail, reporting "ambiguous redirect"
