@@ -39,7 +39,7 @@ gl(){ # All as oneliners, or n ($1) with stats
     clear && [[ "$1" ]] && {
         git log --stat -n $1
     } || {
-        git log --oneline
+        git log --oneline -n 10
     }
 }
 gpf(){ git push --force-with-lease; } # force required after rebase
