@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-export ANSIBASH_VERSION='0.2.7'
+export ANSIBASH_VERSION='0.2.8'
 
 _ansibash(){
 
@@ -7,16 +7,17 @@ _ansibash(){
         ###  PRESERVE TABs of HEREDOC  ###
 		cat <<-EOH
 
-			  A Bash/GNU sort of Ansible requiring nearly no configuration.
+			  A Bash/GNU sort of Ansible requiring nearly no configuration nor additional syntax.
 			
 			  Provision and/or configure all target machines of the ANSIBASH_TARGET_LIST,
-			  optionally as ANSIBASH_USER, using ad-hoc commands and/or local or remote scripts:
+			  optionally as ANSIBASH_USER, using ad-hoc commands and/or local or remote scripts.
 			
 			  USAGE:  ${0##*/} [-x] "command '\$local_arg1' 'local arg 2' '\\\$remote_arg'"
 			          ${0##*/} -c 'command1 args;command2 argX "\$remote_arg" && command3 argY'
 			          ${0##*/} -s "/path/to/local/script.sh arg1 '\$local_arg' '\\\$remote_arg'"
 			          ${0##*/} -u /path/to/local/source [/path/to/remote/parent (Default:~)]
 			          ${0##*/} -d /path/to/remote/source [/path/to/local/parent (Default:.)]
+			          ${0##*/} version
 		EOH
     }
     want(){
@@ -36,6 +37,7 @@ _ansibash(){
 
 		  ANSIBASH_TARGET_LIST='$ANSIBASH_TARGET_LIST'
 		  ANSIBASH_USER='$(ssh_user)'
+		  ANSIBASH_VERBOSE='$ANSIBASH_VERBOSE'
 
 		EOH
     }
@@ -58,7 +60,7 @@ _ansibash(){
     for vm in $ANSIBASH_TARGET_LIST
     do
         conn=$(ssh_user $vm)@$vm
-        echo "=== $conn : $1 $2 $3 $more"
+        [[ $ANSIBASH_VERBOSE ]] && echo "=== $conn : $1 $2 $3 $more" || echo "=== $conn"
         ssh $conn logger "ansibash : FROM: $(id -un)@$(hostname) TO: $conn"
         [[ $mode == '-x' ]] && { ssh $conn "$@" && continue || return 1; }
         [[ $mode == '-c' ]] && { ssh $conn /bin/bash -c "$@" && continue || return 1; }
