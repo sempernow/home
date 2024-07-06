@@ -71,11 +71,9 @@ isBashrcSourced=1
 [[ "$PATH" =~ "$HOME/.local/bin:$HOME/bin:" ]] \
     || PATH="$HOME/.local/bin:$HOME/bin:$PATH"
 
-# Golang
-[[ $(type -t go) ]] && {
-    GOROOT=/usr/local/go1.22.2
-    PATH=$GOROOT/bin:$PATH
-}
+# Configure to newest Golang version if any installed @ /usr/local/go[N.N.N]
+GOROOT=$(find /usr/local -maxdepth 1 -type d -path '*/go*' |sort |tail -n 1) \
+    && PATH=$GOROOT/bin:PATH
 
 # History (history) Options
 #
