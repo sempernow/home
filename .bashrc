@@ -73,7 +73,7 @@ isBashrcSourced=1
 
 # Configure to newest Golang version if any installed @ /usr/local/go[N.N.N]
 GOROOT=$(find /usr/local -maxdepth 1 -type d -path '*/go*' |sort |tail -n 1) \
-    && PATH=$GOROOT/bin:PATH
+    && PATH=$GOROOT/bin:$PATH
 
 # History (history) Options
 #
