@@ -1,0 +1,4 @@
+Defaults    timestamp_timeout=-1
+Defaults    editor=/usr/bin/vim
+Defaults    secure_path = /sbin:/bin:/usr/sbin:/usr/bin:/usr/local/bin
+
