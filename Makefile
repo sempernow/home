@@ -60,7 +60,7 @@ env :
 #	@echo "IS_SUB         : ${IS_SUB}"
 	@echo "HOME           : ${HOME}"
 
-sync : sync-user sync-all
+sync synch : sync-user sync-all
 sync-user :
 	bash make.recipes.sh sync_bins_user
 sync-all :

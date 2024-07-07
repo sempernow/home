@@ -27,7 +27,7 @@
 # For more information, please refer to <http://unlicense.org/>
 # -----------------------------------------------------------------------
 
-export ANSIBASH_VERSION='0.2.10 build 2024-07-06'
+export ANSIBASH_VERSION='0.2.11 build 2024-07-07'
 
 _ansibash(){
 
@@ -68,7 +68,7 @@ _ansibash(){
 		cat <<-EOH
 
 		  ANSIBASH_TARGET_LIST='$ANSIBASH_TARGET_LIST'
-		  ANSIBASH_USER='$(ssh_user)'
+		  ANSIBASH_USER='$ANSIBASH_USER'
 		  ANSIBASH_VERBOSE='$ANSIBASH_VERBOSE'
 
 		EOH
