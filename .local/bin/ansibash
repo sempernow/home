@@ -27,7 +27,7 @@
 # For more information, please refer to <http://unlicense.org/>
 # -----------------------------------------------------------------------
 
-export ANSIBASH_VERSION='0.2.11 build 2024-07-07'
+export ANSIBASH_VERSION='0.2.12 build 2024-07-07'
 
 _ansibash(){
 
@@ -95,13 +95,13 @@ _ansibash(){
         [[ $ANSIBASH_VERBOSE ]] && echo "=== $conn : $1 $2 $3 $more" || echo "=== $conn"
         ssh $conn logger "ansibash : FROM: $(id -un)@$(hostname) TO: $conn"
         [[ $mode == '-x' ]] && { ssh $conn "$@";continue; }
-        [[ $mode == '-c' ]] && { ssh $conn /bin/bash -c "$@" && continue || return 1; }
+        [[ $mode == '-c' ]] && { ssh $conn /bin/bash -c "$@" && continue || return $?; }
         [[ $mode == '-s' ]] && {
             # Must list each positional param else may fail, reporting "ambiguous redirect"
-            ssh -T $conn /bin/bash -s < $1 $2 $3 $4 $5 $6 $7 $8 $9 && continue || return 1
+            ssh -T $conn /bin/bash -s < $1 $2 $3 $4 $5 $6 $7 $8 $9 && continue || return $?
         }
-        [[ $mode == '-u' ]] && { scp -pr "$1" $conn:$target && continue || return 1; }
-        [[ $mode == '-d' ]] && { scp -pr "$conn:$1" "${2:-.}/${host}_${1##*/}" && continue || return 1; }
+        [[ $mode == '-u' ]] && { scp -pr "$1" $conn:$target && continue || return $?; }
+        [[ $mode == '-d' ]] && { scp -pr "$conn:$1" "${2:-.}/${host}_${1##*/}" && continue || return $?; }
         ## TODO : Add and prefer rsync method(s) to handle push/pull.
     done
 }
