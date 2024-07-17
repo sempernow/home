@@ -19,9 +19,11 @@ dij(){ # as valid JSON
     docker image ls --digests --format "{{json .}}" |jq -Mr . --slurp 
 }
 dit(){ # USAGE: dit [--digests]
+    # Must remote "table " from format for actual tab-delimeted fields.
     d(){ docker image ls --format "table {{.ID}}\t{{.Repository}}:{{.Tag}}\t{{.Size}}" $@; }
     h="$( d |head -n1)";echo "$h"; d $@ |grep -v REPOSITORY |sort -t' ' -k2
 }
+
 drmi(){ # Remove image(s) per substring ($1), else prune 
     [[ "$@" ]] && {
         docker image ls |grep "${@%:*}" |grep "${@#*:}" |gawk '{print $3}' |xargs docker image rm -f
