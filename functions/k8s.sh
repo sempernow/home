@@ -32,6 +32,12 @@ unset flag_any_k8s
     k(){ kubectl "$@"; }
     complete -o default -F __start_kubectl k
 
+    # krew : https://krew.sigs.k8s.io/docs/user-guide/setup/install/
+    [[ -d "$HOME/.krew/bin" ]] && {
+        [[ $PATH =~ "$HOME/.krew/bin:" ]] \
+            || PATH="$HOME/.krew/bin:$PATH"
+    }
+
     # Get/Set kubectl namespace : USAGE: kn [NAMESPACE]
     kn() { 
         [[ "$1" ]] && {
