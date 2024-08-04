@@ -21,7 +21,7 @@ dij(){ # as valid JSON
 dit(){ # USAGE: dit [--digests]
     # Must remote "table " from format for actual tab-delimeted fields.
     d(){ docker image ls --format "table {{.ID}}\t{{.Repository}}:{{.Tag}}\t{{.Size}}" $@; }
-    h="$( d |head -n1)";echo "$h"; d $@ |grep -v REPOSITORY |sort -t' ' -k2
+    echo "$( d |head -n1)"; d $@ |grep -v REPOSITORY |sort -t' ' -k2
 }
 
 drmi(){ # Remove image(s) per substring ($1), else prune 
