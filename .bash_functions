@@ -90,26 +90,26 @@ mode(){
     # octal human fname
     # ARGs: [path(Default:.)]
     [[ -f "$@" ]] && {
-        find "${@%/*}" -maxdepth 1 -type f -iname "${@##*/}" -execdir stat --format="  %04a  %A  %n" {} \+ |sed 's/\.\///'
+        find "${@%/*}" -maxdepth 1 -type f -iname "${@##*/}" -execdir stat --format="  %04a  %A  %n" {} \+ |sed 's,./,,'
         return 0
     }
     [[ -d "$@" ]] && d="$@" || d='.'
-    find "$d" -maxdepth 1 -type d -execdir stat --format="  %04a  %A  %n" {} \+ |sed 's/\.\///'
+    find "$d" -maxdepth 1 -type d -execdir stat --format="  %04a  %A  %n" {} \+ |sed 's,./,,'
     echo ''
-    find "$d" -maxdepth 1 -type f -execdir stat --format="  %04a  %A  %n" {} \+ |sed 's/\.\///'
+    find "$d" -maxdepth 1 -type f -execdir stat --format="  %04a  %A  %n" {} \+ |sed 's,./,,'
 }
 alias perms=mode # Depricated
 owner(){
     # owner[uid] group[gid] perms[octal] fname
     # ARGs: [path(Default:.)]
     [[ -f "$@" ]] && {
-        find "${@%/*}" -maxdepth 1 -type f -iname "${@##*/}" -execdir stat --format="  %U[%u]  %G[%g]  %A[%04a]  %n" {} \+ |sed 's/\.\///' |sed 's/Administrators/Admns/'
+        find "${@%/*}" -maxdepth 1 -type f -iname "${@##*/}" -execdir stat --format="  %U(%u)  %G(%g)  %A(%04a)  %n" {} \+ |sed 's,./,,'
         return 0
     }
     [[ -d "$@" ]] && d="$@" || d='.'
-    find "$d" -maxdepth 1 -type d -execdir stat --format="  %U[%u]  %G[%g]  %A[%04a]  %n" {} \+ |sed 's/\.\///' |sed 's/Administrators/Admns/'
+    find "$d" -maxdepth 1 -type d -execdir stat --format="  %U(%u)  %G(%g)  %A(%04a)  %n" {} \+ |sed 's,./,,'
     echo ''
-    find "$d" -maxdepth 1 -type f -execdir stat --format="  %U[%u]  %G[%g]  %A[%04a]  %n" {} \+ |sed 's/\.\///' |sed 's/Administrators/Admns/'
+    find "$d" -maxdepth 1 -type f -execdir stat --format="  %U(%u)  %G(%g)  %A(%04a)  %n" {} \+ |sed 's,./,,'
 }
 selinux(){
     # SELinux security context : See: man stat (%C)
@@ -119,13 +119,13 @@ selinux(){
         return 0
     }
     [[ -f "$@" ]] && {
-        find "${@%/*}" -maxdepth 1 -type f -iname "${@##*/}" -execdir stat --format=" %04a  %A  %C  %n" {} \+ |sed 's/\.\///'
+        find "${@%/*}" -maxdepth 1 -type f -iname "${@##*/}" -execdir stat --format=" %04a  %A  %C  %n" {} \+ |sed 's,./,,'
         return 0
     }
     [[ -d "$@" ]] && d="$@" || d='.'
-    find "$d" -maxdepth 1 -type d -execdir stat --format=" %04a  %A  %C  %n" {} \+ |sed 's/\.\///'
+    find "$d" -maxdepth 1 -type d -execdir stat --format=" %04a  %A  %C  %n" {} \+ |sed 's,./,,'
     echo ''
-    find "$d" -maxdepth 1 -type f -execdir stat --format=" %04a  %A  %C  %n" {} \+ |sed 's/\.\///'
+    find "$d" -maxdepth 1 -type f -execdir stat --format=" %04a  %A  %C  %n" {} \+ |sed 's,./,,'
 }
 
 #########
