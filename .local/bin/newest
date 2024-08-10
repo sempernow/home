@@ -15,10 +15,11 @@ _newest() {(
     # PARAMs: [ @ FNAME ] | [ ROOT-PATH [ -1(PWD-only) | t(prepend mtime) ] ] | (default @ $PWD) 
     # STDOUT: abs-path of newest FILE in $@ [full-depth]
 
-    [[ -d $1 ]] && {
+    [[ -d "$1" ]] && {
         
         pushd "$1"
-        printf "%s" $(find "$(pwd)" -type f ! -path '*/.git/*' -printf '%T+ %p\n' |sort -r |head -n 1 |cut -d' ' -f2-)
+        printf "%s" "$(find "$(pwd)" -type f ! -path '*/.git/*' -printf '%T+ %p\n' |sort -r |head -n 1 |cut -d' ' -f2-)"
+        popd
 
         return
     }
