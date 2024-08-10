@@ -3,9 +3,26 @@
 # Simplest:
 # find . -type f ! -path '*/.git/*' -printf '%T+ %P\n' |sort -r |head -n 1 |cut -d' ' -f2-
 
+zzz_newest(){
+
+    [[ -d $1 ]] && {
+        printf "%s" $(find $dir -type f ! -path '*/.git/*' -printf '%T+ %p\n' |sort -r |head -n 1 |cut -d' ' -f2-)
+        return
+    }
+}
+
 _newest() {( 
     # PARAMs: [ @ FNAME ] | [ ROOT-PATH [ -1(PWD-only) | t(prepend mtime) ] ] | (default @ $PWD) 
     # STDOUT: abs-path of newest FILE in $@ [full-depth]
+
+    [[ -d $1 ]] && {
+        
+        pushd "$1"
+        printf "%s" $(find "$(pwd)" -type f ! -path '*/.git/*' -printf '%T+ %p\n' |sort -r |head -n 1 |cut -d' ' -f2-)
+
+        return
+    }
+
     [[ "$1" == '@' ]] && find . -type f -iname "${2/##*/}" -printf "%T@ $PWD/%P\n" |sort -n |tail -1 |cut -f2- -d" "
     [[ "$2" == '-1' ]] && _PWD_only='-maxdepth 1'|| unset _PWD_only
     [[ "$1" ]] && { [[ -e "$1" ]] || return 99 ; }
