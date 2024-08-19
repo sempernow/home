@@ -190,14 +190,14 @@ PS1="$PS1"'\[\e[1;32m\] \w\[\e[0m\]'                                        # + 
 ## Imporperly escaped ANSI codes cause terminal errors. 
 #################################################################
 
-# NC='\[\e[0m\]'
-# BLUE='\[\e[1;34m\]'
-# GREEN='\[\e[1;32m\]'
-# WHITE='\[\e[0;37m\]'
-# WHITE='\[\e[1;97m\]'
-# GREY='\[\e[1;30m\]'
+#     NC='\[\e[0m\]'
+#   BLUE='\[\e[1;34m\]'
+#  GREEN='\[\e[1;32m\]'
+#  WHITE='\[\e[0;37m\]'
+#  WHITE='\[\e[1;97m\]'
+#   GREY='\[\e[1;30m\]'
 # YELLOW='\[\e[1;93m\]'
-# RED='\[\e[1;91m\]'
+#    RED='\[\e[1;91m\]'
 
 ## Window title
 # PS1='\[\e]0;\u@\h\007\]'                           # Window title
