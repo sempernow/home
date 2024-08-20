@@ -37,7 +37,7 @@ utc(){
 }
 utco(){
     # YYY-MM-DDTHH.mm.ss-HHHH.TZ  : I.e., this zone's Offset (-HHHH) and its name (TZ)
-    t="$(date '+%Y-%m-%dT%H:%M:%S%z.%Z')";echo "$t"
+    t="$(date '+%Y-%m-%dT%H:%M:%S%Z%z')";echo "$t"
     #[[ ! "$1" ]] && { [[ $(type -t putclip) ]] && putclip "$t"; }
 }
 gmt(){
@@ -47,7 +47,7 @@ gmt(){
 }
 gmto(){
     # YYY-MM-DDTHH.mm.ss-HHHH.TZ  
-    t="$(date -u '+%Y-%m-%dT%H:%M:%SZ.%Z')";echo "$t"
+    t="$(date -u '+%Y-%m-%dT%H:%M:%S%Z%z')";echo "$t"
     #[[ ! "$1" ]] && { [[ $(type -t putclip) ]] && putclip "$t"; }
 }
 

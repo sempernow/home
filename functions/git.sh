@@ -29,7 +29,7 @@ gc(){ # commit -m [MSG]
     export -f newest
     [[ -d ./.git ]] || git init
     [[ "$@" ]] && _m="$@" || _m="$(newest)"
-    git add -u;git add .;git commit -m "$_m";gl
+    git add -u && git add && git commit -m "$_m" && gl
 }
 gch(){ # checkout [-b NEW]
     [[ "$@" ]] && _b="$@" || { _b="$(date '+%H.%M.%S')"; _b="${_b:0:5}"; }

@@ -2,8 +2,8 @@
 ##################################################
 # Configure bash shell for kubectl|minikube|helm
 ##################################################
-[[ "$isBashK8sSourced" ]] && return
-isBashK8sSourced=1
+#[[ "$isBashK8sSourced" ]] && return
+#isBashK8sSourced=1
 
 set -a # Export all
 unset flag_any_k8s
@@ -12,8 +12,9 @@ unset flag_any_k8s
     flag_any_k8s=1
     pods(){ echo "$(sudo crictl pods |grep -v STATE |awk '{print $1}')"; }
     containers(){ echo "$(sudo crictl ps |grep -v STATE |awk '{print $1}')"; }
+    images(){ echo "$(sudo crictl images |grep -v STATE |awk '{print $1}')"; }
     set +o posix # Abide non-POSIX syntax 
-    source <(crictl completion)
+    source <(sudo crictl completion)
 }
 
 [[ $(type -t cilium) ]] && {
@@ -133,6 +134,13 @@ unset flag_any_k8s
             }
         }
     }
+}
+
+[[ $(type -t k3s) ]] && sudo k3s kubectl get pod -o jsonpath='{.}' && {
+    flag_any_k8s=1
+    set +o posix # Abide non-POSIX syntax 
+    source <(sudo k3s completion bash)
+    k get pod  -o jsonpath='{.}' || alias k='sudo k3s kubectl'
 }
 
 # Helm : Capture all dependencies of a chart
