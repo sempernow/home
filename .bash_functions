@@ -31,22 +31,22 @@ todaynow(){
 }
 
 utc(){
-    # YYY-MM-DDTHH.mm.ss
-    t="$(date '+%Y-%m-%dT%H:%M:%S')";echo "$t"
+    # YYY-MM-DDTHH.mm.ssTZ
+    t="$(date '+%Y-%m-%dT%H:%M:%S%Z')";echo "$t"
     #[[ ! "$1" ]] && { [[ $(type -t putclip) ]] && putclip "$t"; }
 }
 utco(){
-    # YYY-MM-DDTHH.mm.ss-HHHH.TZ  : I.e., this zone's Offset (-HHHH) and its name (TZ)
-    t="$(date '+%Y-%m-%dT%H:%M:%S%Z%z')";echo "$t"
+    # YYY-MM-DDTHH.mm.ss-HHHH
+    t="$(date '+%Y-%m-%dT%H:%M:%S%z')";echo "$t"
     #[[ ! "$1" ]] && { [[ $(type -t putclip) ]] && putclip "$t"; }
 }
 gmt(){
-    # YYY-MM-DDTHH.mm.ssZ  : Appends "Z" for Zero offset AKA Zulu (See military phonetic alpahabet)
+    # YYY-MM-DDTHH.mm.ssZ
     t="$(date -u '+%Y-%m-%dT%H:%M:%SZ')";echo "$t"
     #[[ ! "$1" ]] && { [[ $(type -t putclip) ]] && putclip "$t"; }
 }
 gmto(){
-    # YYY-MM-DDTHH.mm.ss-HHHH.TZ  
+    # YYY-MM-DDTHH.mm.ssZ+0000
     t="$(date -u '+%Y-%m-%dT%H:%M:%S%Z%z')";echo "$t"
     #[[ ! "$1" ]] && { [[ $(type -t putclip) ]] && putclip "$t"; }
 }
