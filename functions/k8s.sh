@@ -2,8 +2,8 @@
 ##################################################
 # Configure bash shell for kubectl|minikube|helm
 ##################################################
-#[[ "$isBashK8sSourced" ]] && return
-#isBashK8sSourced=1
+[[ "$isBashK8sSourced" ]] && return
+isBashK8sSourced=1
 
 set -a # Export all
 unset flag_any_k8s
@@ -140,7 +140,7 @@ unset flag_any_k8s
     flag_any_k8s=1
     set +o posix # Abide non-POSIX syntax 
     source <(sudo k3s completion bash)
-    k get pod  -o jsonpath='{.}' || alias k='sudo k3s kubectl'
+    k get svc -o jsonpath='{.}' 2>/dev/null || alias k='sudo k3s kubectl'
 }
 
 # Helm : Capture all dependencies of a chart
