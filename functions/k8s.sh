@@ -2,11 +2,10 @@
 ##################################################
 # Configure bash shell for kubectl|minikube|helm
 ##################################################
+unset flag_any_k8s
+set -a # Export all
 [[ "$isBashK8sSourced" ]] && return
 isBashK8sSourced=1
-
-set -a # Export all
-unset flag_any_k8s
 
 [[ $(type -t crictl) ]] && {
     flag_any_k8s=1

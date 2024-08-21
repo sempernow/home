@@ -2,12 +2,11 @@
 ################################
 # Configure bash shell for Git
 ################################
-[[ "$isBashGitSourced" ]] && return
-isBashGitSourced=1
-
 [[ "$(type -t git)" ]] || return
 
 set -a # Export all
+[[ "$isBashGitSourced" ]] && return
+isBashGitSourced=1
 
 git_bash_completion=/usr/share/bash-completion/completions/git
 [[ -f $git_bash_completion ]] && source $git_bash_completion

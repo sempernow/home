@@ -2,9 +2,6 @@
 ##############################################
 # Configure bash shell @ WSL|Cygwin|GitBash
 ##############################################
-[[ "$isBashWinSourced" ]] && return
-isBashWinSourced=1
-
 # End here lest environment has WSL(2)
 # [[ "$isWindows" ]] || return
 
@@ -14,6 +11,8 @@ isBashWinSourced=1
 [[ "$(umask)" == "0000" ]] && umask 0022
 
 set -a  # EXPORT ALL 
+[[ "$isBashWinSourced" ]] && return
+isBashWinSourced=1
 
 mkdir -p /c/TEMP
 TEMP='/c/TEMP'  

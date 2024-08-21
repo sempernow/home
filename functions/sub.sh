@@ -2,10 +2,9 @@
 #####################################
 # Configure bash shell @ SUB subnet
 #####################################
+set -a # Export all
 [[ "$isBashSUBSourced" ]] && return
 isBashSUBSourced=1
-
-set -a # Export all
 
 [[ $(type -t minikube) ]] && {
 
@@ -22,7 +21,7 @@ set -a # Export all
         HTTP_PROXY="$http_proxy"
         HTTPS_PROXY="$https_proxy"
 
-        no_proxy_core_static="localhost,127.0.0.1,192.168.0.0/16,172.16.0.0/16,.foo.com,.sub.foo.com,.site.com,.zoo.bar.com,.ms.bar.com,.es.bar.com,.bar.com"
+        no_proxy_core_static="localhost,127.0.0.1,192.168.0.0/16,172.16.0.0/16,.foo.com,.sub.foo.com,.bar.com"
         [[ $no_proxy ]] || no_proxy="$no_proxy_core_static"
         no_proxy_core="${no_proxy}"
         no_proxy_minikube="10.96.0.0/12,192.168.59.0/24,192.168.49.0/24,192.168.39.0/24"
@@ -46,7 +45,7 @@ set -a # Export all
     # Restart minikube if not running, and 
     # reset permissions on all /config.json if user is its owner.
     [[ $(minikube status -o json 2>/dev/null |jq -Mr .Host) != 'Running' ]] && {
-        minikube start && [[ $USER == '4auser' ]] && mperms
+        minikube start && [[ $USER == 'auser' ]] && mperms
     }
 }
 
@@ -58,12 +57,12 @@ set +a # End export all
 set -a # Export all
 
 [[ $(type -t docker) ]] && {
-    alias registry='echo "docker-ng-untrusted-group.bar.com"'
+    alias registry='echo "registry.local"'
 }
 
 # User shares (NFS/autofs) : Recreate, wake, and set helper functions
-cifs_dropbox="/cifs/xfer-wq/DropBox"
-cifs_shared="/cifs/xfer-wq/Shared"
+cifs_dropbox="/cifs/x/DropBox"
+cifs_shared="/cifs/x/Shared"
 [[ -d $cifs_dropbox ]] && { [[ -d $cifs_dropbox/$USER ]] || mkdir -p $cifs_dropbox/$USER; }
 [[ -d $cifs_dropbox/$USER ]] && cifs_dropbox="$cifs_dropbox/$USER"
 [[ -d $cifs_shared ]] && { [[ -d $cifs_shared/$USER ]] || mkdir -p $cifs_shared/$USER; }
@@ -73,7 +72,7 @@ shared(){ push $cifs_shared; }
 wake(){ sudo killall -s SIGUSR1 automount && sudo mount -a; }
 
 # @ Reach-in VM
-[[ $(hostname |grep ONXWQBL) ]] || {
+[[ $(hostname |grep ABCXSA) ]] || {
     printf "\n%s\n" "Hostname(s) of SUB-Provisioned, SSH-configured VM(s)"
     cat ~/.ssh/config |grep Host |grep -v Hostname
 }

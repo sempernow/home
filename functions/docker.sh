@@ -2,12 +2,11 @@
 ##################################################
 # Configure bash shell for Docker
 ##################################################
-#[[ "$isBashDockerSourced" ]] && return
-#isBashDockerSourced=1
-
 [[ $(type -t docker) ]] || return
 
 set -a # Export all
+[[ "$isBashDockerSourced" ]] && return
+isBashDockerSourced=1
 
 ## docker image
 di(){ h="$(docker image ls |head -n1)";echo "$h";docker image ls |grep -v REPOSITORY |sort; }
