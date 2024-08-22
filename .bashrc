@@ -51,10 +51,12 @@ alias sha2=sha256
 ip -c addr > /dev/null 2>&1 && alias ip='ip -c'
 
 # End here if previously sourced unless from /etc/profile.d/
-[[ "$BASH_SOURCE" =~ "/etc/profile.d" ]] || {
-    [[ "$isBashrcSourced" ]] && return
-}
-export isBashrcSourced=1
+#[[ "$BASH_SOURCE" =~ "/etc/profile.d" ]] || {
+#    [[ "$isBashrcSourced" ]] && return
+#}
+#isBashrcSourced=1
+
+set -a # Export all
 
 # Test for GNU Bourne-Again SHell (bash)
 [[ -n "${BASH_VERSION}" ]] && isBash=1 || unset isBash
@@ -70,7 +72,6 @@ export isBashrcSourced=1
 # Set sudo visudo editor
 [[ $(type -t vi) ]] && VISUAL=$(which vi) && EDITOR=$(which vi)
 
-
 # User specific environment
 [[ "$PATH" =~ "$HOME/.local/bin:$HOME/bin:" ]] \
     || PATH="$HOME/.local/bin:$HOME/bin:$PATH"
@@ -82,7 +83,7 @@ GOROOT=$(find /usr/local -maxdepth 1 -type d -path '*/go*' |sort |tail -n 1) \
 # History (history) Options
 #
 # Ignore duplicates and statements starting with space(s)
-export HISTCONTROL=ignoreboth
+HISTCONTROL=ignoreboth
 # Ignore some controlling instructions
 # HISTIGNORE is a colon-delimited list of patterns which should be excluded.
 # The '&' is a special pattern which suppresses duplicate entries.
@@ -108,6 +109,8 @@ export HISTCONTROL=ignoreboth
         [[ -f "$file" ]] && source "$file"
     done 
 }
+
+set +a # End export all
 
 # End here if not interactive
 #[[ "$-" != *i* ]] && return 0

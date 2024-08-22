@@ -10,6 +10,7 @@ isBashSUBSourced=1
 
     # Minikube will not run on NFS, and requires ftype=1 if an XFS volume.
     export MINIKUBE_HOME=/opt/k8s/minikube
+    [[ -d $MINIKUBE_HOME ]] || exit 
     export CHANGE_MINIKUBE_NONE_USER=true # Does nothing
 
     # Set proxy environment (make idempotent)
