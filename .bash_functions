@@ -129,6 +129,7 @@ selinux(){
     echo ''
     find "$d" -maxdepth 1 -type f -execdir stat --format=" %04a  %A  %C  %n" {} \+ |sed 's,./,,'
 }
+#newest(){ find ${1:-.} -type f ! -path '*/.git/*' -printf '%T+ %P\n' |sort -r |head -n 1 |cut -d' ' -f2-; }
 newest(){
     #TZ=Zulu
     [[ ${1,,} == 't' ]] &&
@@ -137,10 +138,6 @@ newest(){
                 find . -type f ! -path '*/.git/*' -printf '%T+ %P @ %TY-%Tm-%TdT%TH:%TMZ\n' \
                     |sort -r |head -n 1 |cut -d' ' -f2
 }
-
-newest(){ find ${1:-.} -type f ! -path '*/.git/*' -printf '%T+ %P\n' |sort -r |head -n 1 |cut -d' ' -f2-; }
-
-
 
 #########
 # systemd
