@@ -6,7 +6,8 @@
 # End here if functions already exist (run once)
 #[[ "$(type -t now)" ]] && return
 
-set -a  # EXPORT ALL ...
+set -a # Export all
+trap 'set +a' RETURN
 
 [[ "$_PID_1xSHELL" ]] || _PID_1xSHELL=$(ps |grep 'bash' |sort -k 7 |awk '{print $1;}' |head -n 1)
 
@@ -15,24 +16,24 @@ set -a  # EXPORT ALL ...
 
 today(){
     # YYY-MM-DD
-    t="$(date +%F)";echo "$t"
+    t="$(date '+%F')";echo "$t"
     #[[ ! "$1" ]] && { REQUIREs putclip ; putclip "$t"; }
     #[[ ! "$1" ]] && { [[ $(type -t putclip) ]] && putclip "$t"; }
 }
 now(){
     # HH.mm.ss
-    t="$(date +%H.%M.%S)";echo "$t"
+    t="$(date '+%H.%M.%S')";echo "$t"
     #[[ ! "$1" ]] && { [[ $(type -t putclip) ]] && putclip "$t"; }
 }
 todaynow(){
     # YYY-MM-DD_HH.mm.ss
-    t="$(date +%F_%H.%M.%S)";echo "$t"
+    t="$(date '+%F_%H.%M.%S')";echo "$t"
     #[[ ! "$1" ]] && { [[ $(type -t putclip) ]] && putclip "$t"; }
 }
 
 utc(){
-    # YYY-MM-DDTHH.mm.ssTZ
-    t="$(date '+%Y-%m-%dT%H:%M:%S%Z')";echo "$t"
+    # YYY-MM-DDTHH.mm.ss [TZ]
+    t="$(date '+%Y-%m-%dT%H:%M:%S [%Z]')";echo "$t"
     #[[ ! "$1" ]] && { [[ $(type -t putclip) ]] && putclip "$t"; }
 }
 utco(){
@@ -46,8 +47,8 @@ gmt(){
     #[[ ! "$1" ]] && { [[ $(type -t putclip) ]] && putclip "$t"; }
 }
 gmto(){
-    # YYY-MM-DDTHH.mm.ssZ+0000
-    t="$(date -u '+%Y-%m-%dT%H:%M:%S%Z%z')";echo "$t"
+    # YYY-MM-DDTHH.mm.ss+0000
+    t="$(date -u '+%Y-%m-%dT%H:%M:%S%z')";echo "$t"
     #[[ ! "$1" ]] && { [[ $(type -t putclip) ]] && putclip "$t"; }
 }
 
@@ -68,11 +69,12 @@ isoz(){
 ####
 # FS
 
-dft(){ df -hT |grep -e Type -e ${1:-ext4}; }
+dft(){ df -hT |grep -e Type -e ${1:-xfs}; }
 path(){
     # Parse and print $PATH
-    clear ; echo ; echo '  $PATH (parsed)'; echo
-    declare IFS=: ; printf '  %s\n' $PATH
+    clear;echo;echo '  $PATH (parsed)';echo
+    declare IFS=:
+    printf '  %s\n' $PATH
 }
 [[ $(type -t pushd) ]] && {
     push() {
@@ -127,6 +129,18 @@ selinux(){
     echo ''
     find "$d" -maxdepth 1 -type f -execdir stat --format=" %04a  %A  %C  %n" {} \+ |sed 's,./,,'
 }
+newest(){
+    #TZ=Zulu
+    [[ ${1,,} == 't' ]] &&
+        find . -type f ! -path '*/.git/*' -printf '%T+ %P @ %TY-%Tm-%TdT%TH:%TMZ\n' \
+            |sort -r |head -n 1 |cut -d' ' -f2- ||
+                find . -type f ! -path '*/.git/*' -printf '%T+ %P @ %TY-%Tm-%TdT%TH:%TMZ\n' \
+                    |sort -r |head -n 1 |cut -d' ' -f2
+}
+
+newest(){ find ${1:-.} -type f ! -path '*/.git/*' -printf '%T+ %P\n' |sort -r |head -n 1 |cut -d' ' -f2-; }
+
+
 
 #########
 # systemd
@@ -412,8 +426,6 @@ hostfprs(){
 
 vars(){ declare -p |grep -E 'declare -(x|[a-z]*x)' |awk '{print $3}' |grep -v __git; }
 
-#newest(){ find ${1:-.} -type f ! -path '*/.git/*' -printf '%T+ %P\n' |sort -r |head -n 1 |cut -d' ' -f2-; }
-
 colors() {
     # Each is a background color and contrasting text color.
     # Usage: colors;printf "\n %s\n" "$green MESSAGE $norm"
@@ -431,15 +443,15 @@ colors() {
     norm="$normal"
 
 }
+
 errMSG() {
     # ARGs: MESSAGE
-    [[ "$TERM" ]] && {
-        colors;printf "\n $red ERROR $norm : %s\n" "$@"
-    } || {
-        printf "\n %s\n" " ERROR : $@"
-    }
+    [[ "$TERM" ]] &&
+        colors;printf "\n $red ERROR $norm : %s\n" "$@" ||
+            printf "\n %s\n" " ERROR : $@"
     return 99
 }
+
 REQUIREs(){
     # ARGs: FUNCNAME1 [FUNCNAME2 ...]
     # function[s] exist test; exit on fail; $? is 86 on fail, else 0
@@ -473,7 +485,7 @@ putclip() {
         # '-i -f -silent' and null redirect is workaround for command-sustitution case ['-loop #' bug]
     fi
     # validate clipboard; rpt & exit on fail
-    [[ "$_CLIPBOARD" ]] || { errMSG "$FUNCNAME[clipboard-not-exist]" ; return 86 ; }
+    [[ "$_CLIPBOARD" ]] || { errMSG "$FUNCNAME[clipboard-not-exist]"; return 86; }
     # put :: $@ => clipboard
     [[ "$@" ]] && {
         [[ "$OSTYPE" == 'linux-gnu' ]] && { printf "$*" | $_CLIPBOARD > /dev/null; true; } || { printf "$*" > $_CLIPBOARD; true; }
@@ -496,15 +508,13 @@ shlvl(){
     # Show shell level [and message]
     colors; [[ "$@" ]] && _msg=": $@" || unset _msg
     [[ "${FUNCNAME[1]}" == 'x' ]] && _shlvl=$(( $SHLVL - 1 )) || _shlvl=$SHLVL
-    [[ "$_shlvl" == "1" ]] && [[ "$PPID" == "$_PID_1xSHELL" ]] && { printf "\n %s\n" "$red $(( $_shlvl ))x ${SHELL##*/} $norm $_msg" ; } || { printf "\n %s\n" "$(( $_shlvl ))x ${SHELL##*/} $_msg" ; }
+    [[ "$_shlvl" == "1" ]] && [[ "$PPID" == "$_PID_1xSHELL" ]] && { printf "\n %s\n" "$red $(( $_shlvl ))x ${SHELL##*/} $norm $_msg"; } || { printf "\n %s\n" "$(( $_shlvl ))x ${SHELL##*/} $_msg"; }
 }
 envsans(){
     # Print environment variables without functions
     declare -p |grep -E '^declare -x [^=]+=' |sed 's,",,g' |awk '{print $3}'
     printf "\n\t(%s)\n" 'Environment variables containing special characters may not have printed accurately.'
 }
-
-set +a  # END export
 
 ## End here if not interactive
 # [[ "$-" != *i* ]] && return

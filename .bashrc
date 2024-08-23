@@ -45,7 +45,7 @@ alias grepba='grep -B5 -A5'
 alias sha2=sha256
 
 # End here if not bash
-[[ true ]] || { . ~/.bash_functions; return; }
+[[ true ]] || { source ~/.bash_functions; return; }
 
 # Network
 ip -c addr > /dev/null 2>&1 && alias ip='ip -c'
@@ -57,14 +57,15 @@ ip -c addr > /dev/null 2>&1 && alias ip='ip -c'
 #isBashrcSourced=1
 
 set -a # Export all
+trap 'set +a' RETURN
 
 # Test for GNU Bourne-Again SHell (bash)
-[[ -n "${BASH_VERSION}" ]] && isBash=1 || unset isBash
+[[ -n "${BASH_VERSION}" ]] && isBash=1    || unset isBash
 [[ "$PATH" =~ 'Windows' ]] && isWindows=1 || unset isWindows
-[[ "$(type -t wsl.exe)" ]] && hasWSL=1 || unset hasWSL
+[[ "$(type -t wsl.exe)" ]] && hasWSL=1    || unset hasWSL
 
 # If at bash and syntax not POSIX, then abide other (e.g., Process Substitution)
-[[ "$isBash" ]] && set +o posix 
+[[ "$isBash" ]] && set +o posix
 
 # Source global definitions
 [[ -f /etc/bashrc ]] && source /etc/bashrc
@@ -73,12 +74,14 @@ set -a # Export all
 [[ $(type -t vi) ]] && VISUAL=$(which vi) && EDITOR=$(which vi)
 
 # User specific environment
-[[ "$PATH" =~ "$HOME/.local/bin:$HOME/bin:" ]] \
-    || PATH="$HOME/.local/bin:$HOME/bin:$PATH"
+[[ -d $HOME/.local/bin ]] && {
+    [[ "$PATH" =~ "$HOME/.local/bin:$HOME/bin:" ]] ||
+        PATH="$HOME/.local/bin:$HOME/bin:$PATH"
+}
 
 # Configure to newest Golang version if any installed @ /usr/local/go[N.N.N]
-GOROOT=$(find /usr/local -maxdepth 1 -type d -path '*/go*' |sort |tail -n 1) \
-    && PATH=$GOROOT/bin:$PATH
+GOROOT=$(find /usr/local -maxdepth 1 -type d -path '*/go*' |sort |tail -n 1)
+[[ -d $GOROOT ]] && PATH=$GOROOT/bin:$PATH
 
 # History (history) Options
 #
@@ -103,35 +106,32 @@ HISTCONTROL=ignoreboth
 
 # Source sibling configs unless already configured or configuring at all-users directory
 [[ "$BASH_SOURCE" =~ "/etc/profile.d" ]] || {
-    [[ -f "${HOME}/.bash_aliases" ]] && source "${HOME}/.bash_aliases"
+    [[ -f "${HOME}/.bash_aliases" ]]   && source "${HOME}/.bash_aliases"
     [[ -f "${HOME}/.bash_functions" ]] && source "${HOME}/.bash_functions"
-    for file in $(find $HOME -maxdepth 1 -type f -iname '.bashrc_*'); do 
+    for file in $(find $HOME -maxdepth 1 -type f -iname '.bashrc_*');do
         [[ -f "$file" ]] && source "$file"
-    done 
+    done
 }
-
-set +a # End export all
 
 # End here if not interactive
 #[[ "$-" != *i* ]] && return 0
-[[ -z "$PS1" ]] && return 0
+[[ -z "$PS1" ]] && return 0 || set +a # End export all
 
-# Enable programmable completion features.
-# May already be enabled in /etc/bash.bashrc,
+# Programmable completion features
+# may already be enabled at /etc/bash.bashrc,
 # which is sourced by /etc/profile.
-[[ $(type -t shopt) ]] && [[ ! "$(shopt -oq posix)" ]] && {
-    [[ -f /usr/share/bash-completion/bash_completion ]] \
-        && source /usr/share/bash-completion/bash_completion || {
+[[ $(type -t shopt) ]] && [[ ! "$(shopt -oq posix)" ]] &&
+    [[ -f /usr/share/bash-completion/bash_completion ]] &&
+        source /usr/share/bash-completion/bash_completion || {
             [[ -f /etc/bash_completion ]] && source /etc/bash_completion
     }
-}
 # Source all completions that abide compspec.
 # See man bash "Programmable Completion" section.
 _completion_loader(){
     source "/etc/bash_completion.d/$1.sh" >/dev/null 2>&1 && return 124
 }
-[[ "$(type -t complete)" ]] \
-    && complete -D -F _completion_loader -o bashdefault -o default
+[[ "$(type -t complete)" ]] &&
+    complete -D -F _completion_loader -o bashdefault -o default
 
 #export TZ='America/New_York'
 
@@ -151,11 +151,11 @@ _completion_loader(){
 #os="$(os |grep NAME |head -n1 |cut -d'=' -f2 |sed 's/"//g')"
 #ver="$(os |grep VERSION_ID |head -n1 |cut -d'=' -f2 |sed 's/"//g')"
 
-#################################################################
-##  MUST escape and hardcode ANSI code, else fails silently;
-##  revealed only on certain keypress, and only sometimes.
-##  For example, up-arrow keypress may not clear prior content.
-#################################################################
+########################################################################
+##  Must escape and hardcode ANSI code, else fails silently;
+##  revealed only on certain keypress, condition, and shell.
+##  Example symptom is up-arrow keypress fails to clear prior content.
+########################################################################
 PS1=''
 [[ $isWindows ]] && {
     [[ "$_OS" ]] && {

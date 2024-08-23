@@ -4,8 +4,10 @@
 ################################
 [[ "$(type -t git)" ]] || return
 
-set -a # Export all
 [[ "$isBashGitSourced" ]] && return
+
+set -a # Export all
+trap 'set +a' RETURN
 isBashGitSourced=1
 
 git_bash_completion=/usr/share/bash-completion/completions/git
@@ -30,16 +32,12 @@ gc(){ # commit -m [MSG]
     [[ "$@" ]] && _m="$@" || _m="$(newest)"
     git add -u && git add && git commit -m "$_m" && gl
 }
-gch(){ # checkout [-b NEW]
-    [[ "$@" ]] && _b="$@" || { _b="$(date '+%H.%M.%S')"; _b="${_b:0:5}"; }
+gch(){ # Checkout else create branch $1 else create branch HH.MM
+    [[ "$@" ]] && _b="$@" || _b="$(date '+%H.%M')"
     [[ "$(git branch |grep "$_b")" ]] && git checkout "$_b" || git checkout -b "$_b"
 }
-gl(){ # All as oneliners, or n ($1) with stats
-    clear && [[ "$1" ]] && {
-        git log --stat -n $1
-    } || {
-        git log --oneline -n 10
-    }
+gl(){ # List all commits, one line per, or n ($1) showing changes (stat) per 
+    clear && [[ "$1" ]] && git log --stat -n $1 || git log --oneline -n 10
 }
 gpf(){ git push --force-with-lease; } # force required after rebase
 gr(){
@@ -67,8 +65,6 @@ grs(){
     git reset --soft HEAD~$count_commits
 }
 gs(){ git status; }
-
-set +a # End export all
 
 ## End here if not interactive
 [[ -z "$PS1" ]] && return 0

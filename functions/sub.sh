@@ -2,8 +2,10 @@
 #####################################
 # Configure bash shell @ SUB subnet
 #####################################
-set -a # Export all
 [[ "$isBashSUBSourced" ]] && return
+
+set -a # Export all
+trap 'set +a' RETURN
 isBashSUBSourced=1
 
 [[ $(type -t minikube) ]] && {
@@ -50,16 +52,10 @@ isBashSUBSourced=1
     }
 }
 
-set +a # End export all
-
 ## End here if not interactive
 [[ -z "$PS1" ]] && return 0
 
-set -a # Export all
-
-[[ $(type -t docker) ]] && {
-    alias registry='echo "registry.local"'
-}
+[[ $(type -t docker) ]] && alias registry='echo "registry.local"'
 
 # User shares (NFS/autofs) : Recreate, wake, and set helper functions
 cifs_dropbox="/cifs/x/DropBox"
@@ -72,12 +68,9 @@ dropbox(){ push $cifs_dropbox; }
 shared(){ push $cifs_shared; }
 wake(){ sudo killall -s SIGUSR1 automount && sudo mount -a; }
 
-# @ Reach-in VM
 [[ $(hostname |grep ABCXSA) ]] || {
-    printf "\n%s\n" "Hostname(s) of SUB-Provisioned, SSH-configured VM(s)"
+    printf "\n%s\n" "Hostname(s) of SSH-configured VM(s)"
     cat ~/.ssh/config |grep Host |grep -v Hostname
 }
-
-set +a # End export all
 
 [[ "$BASH_SOURCE" ]] && echo "@ $BASH_SOURCE"

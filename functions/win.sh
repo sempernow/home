@@ -10,8 +10,10 @@
 # Only @ WSL @ ConEMU; @ WSLtty, umask is 0022
 [[ "$(umask)" == "0000" ]] && umask 0022
 
-set -a  # EXPORT ALL 
 [[ "$isBashWinSourced" ]] && return
+
+set -a # Export all
+trap 'set +a' RETURN
 isBashWinSourced=1
 
 mkdir -p /c/TEMP
@@ -291,15 +293,12 @@ flagupdate() {
 } 
 
 # User specific environment and startup programs
-[[ "$PATH" =~ "$HOME/.bin:" ]] \
-    || PATH="$HOME/.bin:$PATH"
+[[ "$PATH" =~ "$HOME/.bin:" ]] || PATH="$HOME/.bin:$PATH"
 
 # Get/set top-level shell PID [ps @ Cygwin prefixes 1st collumn w/ 'I' ]
 _PID_1xSHELL=$( ps |grep 'bash' |sort -k 7 |awk '{print $1;}' |head -n 1 )
 # handle Cygwin; @ ps 'bash' line, collumn prefixed with 'I'
 [[ "$( isinteger $_PID_1xSHELL )" ]] || _PID_1xSHELL=$( ps |grep 'bash' |sort -k 7 |awk '{print $2;}' |head -n 1 )
-
-set +a  # END export 
 
 ## End here if not interactive
 [[ -z "$PS1" ]] && return 0

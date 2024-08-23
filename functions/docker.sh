@@ -4,8 +4,10 @@
 ##################################################
 [[ $(type -t docker) ]] || return
 
-set -a # Export all
 [[ "$isBashDockerSourced" ]] && return
+
+set -a # Export all
+trap 'set +a' RETURN
 isBashDockerSourced=1
 
 ## docker image
@@ -20,16 +22,16 @@ dij(){ # as valid JSON
 dit(){ # USAGE: dit [--digests]
     # Must remote "table " from format for actual tab-delimeted fields.
     d(){ docker image ls --format "table {{.ID}}\t{{.Repository}}:{{.Tag}}\t{{.Size}}" $@; }
-    echo "$( d |head -n1)"; d $@ |grep -v REPOSITORY |sort -t' ' -k2
+    echo "$( d |head -n1)";d $@ |grep -v REPOSITORY |sort -t' ' -k2
 }
 
 drmi(){ # Remove image(s) per substring ($1), else prune 
-    [[ "$@" ]] && {
-        docker image ls |grep "${@%:*}" |grep "${@#*:}" |gawk '{print $3}' |xargs docker image rm -f
-    } || {
-        docker image prune -f 
-    }
+    [[ "$@" ]] &&
+        docker image ls |grep "${@%:*}" |grep "${@#*:}" |gawk '{print $3}' \
+            |xargs docker image rm -f ||
+                docker image prune -f 
 }
+
 ## docker container 
 alias dps='docker container ps --format "table {{.ID}}  {{.Names}}\t{{.Image}}\t{{.Ports}}\t{{.Status}}"'
 alias dpsa='docker ps -a --format "table {{.ID}}  {{.Names}}\t{{.Image}}\t{{.Status}}\t{{.Ports}}"'
@@ -63,8 +65,6 @@ dstats(){
     [[ "$1" ]] && _no_stream='--no-stream' || unset _no_stream
     docker stats $_no_stream --format 'table {{.ID}}  {{.Name}}\t{{.CPUPerc}}  {{.MemUsage}}\t{{.MemPerc}}  {{.NetIO}}\t{{.BlockIO}}\t{{.PIDs}}'
 }
-
-set +a # End export all
 
 ## End here if not interactive
 [[ -z "$PS1" ]] && return 0

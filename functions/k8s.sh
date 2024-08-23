@@ -2,10 +2,12 @@
 ##################################################
 # Configure bash shell for kubectl|minikube|helm
 ##################################################
-unset flag_any_k8s
-set -a # Export all
 [[ "$isBashK8sSourced" ]] && return
+
+set -a # Export all
+trap 'set +a' RETURN
 isBashK8sSourced=1
+unset flag_any_k8s
 
 [[ $(type -t crictl) ]] && {
     flag_any_k8s=1
@@ -23,7 +25,7 @@ isBashK8sSourced=1
 
 [[ $(type -t kubectl) ]] && {
     flag_any_k8s=1
-    all='deploy,sts,rs,pod,ep,svc,ingress,cm,secret,pvc,pv'
+    all='deploy,ds,sts,pod,svc,ep,ingress,cm,secret,pvc,pv'
 
     set +o posix # Abide non-POSIX syntax 
     source <(kubectl completion bash)
@@ -34,13 +36,13 @@ isBashK8sSourced=1
 
     # krew : https://krew.sigs.k8s.io/docs/user-guide/setup/install/
     [[ -d "$HOME/.krew/bin" ]] && {
-        [[ $PATH =~ "$HOME/.krew/bin:" ]] \
-            || PATH="$HOME/.krew/bin:$PATH"
+        [[ $PATH =~ "$HOME/.krew/bin:" ]] ||
+            PATH="$HOME/.krew/bin:$PATH"
     }
 
     # Get/Set kubectl namespace : USAGE: kn [NAMESPACE]
     kn() { 
-        [[ "$1" ]] && {
+        [[ $1 ]] && {
             kubectl config set-context --current --namespace $1
         } || {
             [[ $(type -t yq) ]] && {
@@ -53,7 +55,7 @@ isBashK8sSourced=1
 
     # Get/Set kubectl context : USAGE: kx [CONTEXT_NAME]
     kx() { 
-        [[ "$1" ]] && {
+        [[ $1 ]] && {
             kubectl config use-context $1
         } || {
             #kubectl config current-context
@@ -106,9 +108,7 @@ isBashK8sSourced=1
                 |grep -- -- |grep -v color |grep -v grep
         }
         export -f _ps
-        [[ "$1" ]] && _ps $1 || {
-            echo $k8s |xargs -n 1 /bin/bash -c '_ps "$@"' _
-        }
+        [[ $1 ]] && _ps $1 || echo $k8s |xargs -n 1 /bin/bash -c '_ps "$@"' _ 
     }
 }
 
@@ -198,8 +198,6 @@ isBashK8sSourced=1
         }
     }
 }
-
-set +a # End export all
 
 ## End here if not interactive
 [[ -z "$PS1" ]] && return 0
