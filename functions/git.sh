@@ -4,12 +4,13 @@
 ################################
 [[ "$(type -t git)" ]] || return
 [[ "$isBashGitSourced" ]] && return
-set -a # Export all
-#trap 'set +a' RETURN
-#isBashGitSourced=1
 
 git_bash_completion=/usr/share/bash-completion/completions/git
 [[ -f $git_bash_completion ]] && source $git_bash_completion
+
+set -a # Export all
+trap 'set +a' RETURN
+#isBashGitSourced=1
 
 alias gcfg='git config -l'
 ga(){ git add . ; git status; }
@@ -63,8 +64,6 @@ grs(){
     git reset --soft HEAD~$count_commits
 }
 gs(){ git status; }
-
-set +a # End export all
 
 ## End here if not interactive
 [[ -z "$PS1" ]] && return 0
