@@ -13,9 +13,9 @@ trap 'set +a' RETURN
 [[ $(type -t minikube) ]] && {
 
     # Minikube will not run on NFS, and requires ftype=1 if an XFS volume.
-    export MINIKUBE_HOME=/opt/k8s/minikube
+    MINIKUBE_HOME=/opt/k8s/minikube
     [[ -d $MINIKUBE_HOME ]] || exit 
-    export CHANGE_MINIKUBE_NONE_USER=true # Does nothing
+    CHANGE_MINIKUBE_NONE_USER=true # Does nothing
 
     # Set proxy environment (make idempotent)
     no_proxy_minikube="10.96.0.0/12,192.168.59.0/24,192.168.49.0/24,192.168.39.0/24"

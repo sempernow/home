@@ -89,11 +89,12 @@ HISTCONTROL=ignoreboth
 # Ignore some controlling instructions
 # HISTIGNORE is a colon-delimited list of patterns which should be excluded.
 # The '&' is a special pattern which suppresses duplicate entries.
-#export HISTIGNORE=$'[ \t]*:&:[fb]g:exit'
+#HISTIGNORE=$'[ \t]*:&:[fb]g:exit'
 [[ "$isBash" ]] && {
     shopt -s histappend
     shopt -s checkwinsize
 }
+set +a
 
 # Umask
 #
@@ -102,7 +103,6 @@ HISTCONTROL=ignoreboth
 # umask 027
 # Paranoid: neither group nor others have any perms:
 # umask 077
-
 # Source sibling configs unless already configured or configuring at all-users directory
 [[ "$BASH_SOURCE" =~ "/etc/profile.d" ]] || {
     [[ -f "${HOME}/.bash_aliases" ]]   && source "${HOME}/.bash_aliases"

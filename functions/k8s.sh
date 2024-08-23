@@ -3,36 +3,29 @@
 # Configure bash shell for kubectl|minikube|helm
 ##################################################
 [[ "$isBashK8sSourced" ]] && return
-set -a # Export all
-trap 'set +a' RETURN
 #isBashK8sSourced=1
 unset flag_any_k8s
 
 [[ $(type -t crictl) ]] && {
     flag_any_k8s=1
+    set -a
     pods(){ echo "$(sudo crictl pods |grep -v STATE |awk '{print $1}')"; }
     containers(){ echo "$(sudo crictl ps |grep -v STATE |awk '{print $1}')"; }
     images(){ echo "$(sudo crictl images |grep -v STATE |awk '{print $1}')"; }
-    set +o posix # Abide non-POSIX syntax 
+    set +a;set +o posix
     source <(sudo crictl completion)
 }
 
 [[ $(type -t cilium) ]] && {
-    set +o posix # Abide non-POSIX syntax 
+    flag_any_k8s=1
+    set +a;set +o posix
     source <(cilium completion bash)
 }
 
 [[ $(type -t kubectl) ]] && {
     flag_any_k8s=1
+    set -a
     all='deploy,ds,sts,pod,svc,ep,ingress,cm,secret,pvc,pv'
-
-    set +o posix # Abide non-POSIX syntax 
-    source <(kubectl completion bash)
-
-    # k and its completion
-    k(){ kubectl "$@"; }
-    complete -o default -F __start_kubectl k
-
     # krew : https://krew.sigs.k8s.io/docs/user-guide/setup/install/
     [[ -d "$HOME/.krew/bin" ]] && {
         [[ $PATH =~ "$HOME/.krew/bin:" ]] ||
@@ -109,14 +102,17 @@ unset flag_any_k8s
         export -f _ps
         [[ $1 ]] && _ps $1 || echo $k8s |xargs -n 1 /bin/bash -c '_ps "$@"' _ 
     }
+
+    set +a;set +o posix # Abide non-POSIX syntax
+    source <(kubectl completion bash)
+    # k and its completion
+    k(){ kubectl "$@"; }
+    complete -o default -F __start_kubectl k
 }
 
 [[ $(type -t minikube) ]] && {
     flag_any_k8s=1
-
-    set +o posix # Abide non-POSIX syntax 
-    source <(minikube completion bash)
-    
+    set -a
     # d2m : Configure host's Docker client (docker) to Minikube's Docker server.
     d2m(){ [[ $(echo $DOCKER_HOST) ]] || eval $(minikube -p minikube docker-env); }
 
@@ -132,11 +128,13 @@ unset flag_any_k8s
             }
         }
     }
+    set +a;set +o posix # Abide non-POSIX syntax 
+    source <(minikube completion bash)
 }
 
 [[ $(type -t k3s) ]] && sudo k3s kubectl get pod -o jsonpath='{.}' && {
     flag_any_k8s=1
-    set +o posix # Abide non-POSIX syntax 
+    set +a;set +o posix # Abide non-POSIX syntax 
     source <(sudo k3s completion bash)
     k get svc -o jsonpath='{.}' 2>/dev/null || alias k='sudo k3s kubectl'
 }
@@ -149,6 +147,7 @@ unset flag_any_k8s
 #   dis hvi@hdi@${extracted}.log
 [[ $(type -t helm) && $(type -t docker) ]] && {
     flag_any_k8s=1
+    set -a
     # List all Docker images of an extracted Helm chart $1 (directory).
     ###############################################################
     # UPDATE: THIS FAILs to capture all. 
@@ -196,6 +195,7 @@ unset flag_any_k8s
             echo "=== USAGE : $FUNCNAME PATH_TO_IMAGES_LIST_FILE (E.g., hvi@hdi@CHART-VER.log)"
         }
     }
+    set +a
 }
 
 ## End here if not interactive
