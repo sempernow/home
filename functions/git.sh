@@ -30,6 +30,7 @@ gc(){ # commit -m [MSG]
     [[ -d ./.git ]] || git init
     [[ "$@" ]] && _m="$@" || _m="$(newest)"
     git add -u && git add && git commit -m "$_m" && gl
+    true
 }
 gch(){ # Checkout else create branch $1 else create branch HH.MM
     [[ "$@" ]] && _b="$@" || _b="$(date '+%H.%M')"
