@@ -2,11 +2,13 @@
 #####################################
 # Configure bash shell @ SUB subnet
 #####################################
-[[ "$isBashSUBSourced" ]] && return
 
+return
+
+[[ "$isBashSUBSourced" ]] && return
 set -a # Export all
 trap 'set +a' RETURN
-isBashSUBSourced=1
+#isBashSUBSourced=1
 
 [[ $(type -t minikube) ]] && {
 

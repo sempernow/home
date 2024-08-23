@@ -3,10 +3,9 @@
 # Configure bash shell for kubectl|minikube|helm
 ##################################################
 [[ "$isBashK8sSourced" ]] && return
-
 set -a # Export all
 trap 'set +a' RETURN
-isBashK8sSourced=1
+#isBashK8sSourced=1
 unset flag_any_k8s
 
 [[ $(type -t crictl) ]] && {

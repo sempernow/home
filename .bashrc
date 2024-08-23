@@ -51,13 +51,12 @@ alias sha2=sha256
 ip -c addr > /dev/null 2>&1 && alias ip='ip -c'
 
 # End here if previously sourced unless from /etc/profile.d/
-#[[ "$BASH_SOURCE" =~ "/etc/profile.d" ]] || {
-#    [[ "$isBashrcSourced" ]] && return
-#}
-#isBashrcSourced=1
-
+[[ "$BASH_SOURCE" =~ "/etc/profile.d" ]] || {
+    [[ "$isBashrcSourced" ]] && return
+}
 set -a # Export all
 trap 'set +a' RETURN
+#isBashrcSourced=1
 
 # Test for GNU Bourne-Again SHell (bash)
 [[ -n "${BASH_VERSION}" ]] && isBash=1    || unset isBash
@@ -132,8 +131,6 @@ _completion_loader(){
 }
 [[ "$(type -t complete)" ]] &&
     complete -D -F _completion_loader -o bashdefault -o default
-
-#export TZ='America/New_York'
 
 ########
 # Prompt

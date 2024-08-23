@@ -1,18 +1,23 @@
 # source .bash_functions || source /etc/profile.d/${USER}-02-bash_functions.sh
 
-#[[ "$isBashFunctionsSourced" ]] && return
-#isBashFunctionsSourced=1
-
 # End here if functions already exist (run once)
 #[[ "$(type -t now)" ]] && return
 
+# End here if previously sourced unless from /etc/profile.d/
+[[ "$BASH_SOURCE" =~ "/etc/profile.d" ]] || {
+    [[ "$isBashFunctionsSourced" ]] && return
+}
 set -a # Export all
 trap 'set +a' RETURN
+#isBashFunctionsSourced=1
 
 [[ "$_PID_1xSHELL" ]] || _PID_1xSHELL=$(ps |grep 'bash' |sort -k 7 |awk '{print $1;}' |head -n 1)
 
 ######
 # Date
+
+# For EST (UTC-05:00) that ignores Daylight Savings Time (UTC-04:00):
+#TZ='America/New_York'
 
 today(){
     # YYY-MM-DD
