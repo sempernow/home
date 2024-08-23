@@ -5,7 +5,7 @@
 [[ "$(type -t git)" ]] || return
 [[ "$isBashGitSourced" ]] && return
 set -a # Export all
-trap 'set +a' RETURN
+#trap 'set +a' RETURN
 #isBashGitSourced=1
 
 git_bash_completion=/usr/share/bash-completion/completions/git
@@ -63,6 +63,8 @@ grs(){
     git reset --soft HEAD~$count_commits
 }
 gs(){ git status; }
+
+set +a # End export all
 
 ## End here if not interactive
 [[ -z "$PS1" ]] && return 0
