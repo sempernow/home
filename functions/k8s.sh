@@ -6,6 +6,7 @@
 #isBashK8sSourced=1
 unset flag_any_k8s
 
+
 [[ $(type -t crictl) ]] && {
     flag_any_k8s=1
     set -a
@@ -26,6 +27,12 @@ unset flag_any_k8s
     flag_any_k8s=1
     set -a
     all='deploy,ds,sts,pod,svc,ep,ingress,cm,secret,pvc,pv'
+    k(){ kubectl "$@"; }
+    set +a;set +o posix
+    source <(kubectl completion bash)
+    # k completion
+    complete -o default -F __start_kubectl k
+
     # krew : https://krew.sigs.k8s.io/docs/user-guide/setup/install/
     [[ -d "$HOME/.krew/bin" ]] && {
         [[ $PATH =~ "$HOME/.krew/bin:" ]] ||
@@ -80,7 +87,7 @@ unset flag_any_k8s
         printf "%s\n" "$nodes" |xargs -IX /bin/bash -c 'k get pod -o wide |grep $1' _ X
     }
 
-    psk(){ 
+    psk(){
         # ps aux; all k8s-related processes. 
         # ARGs: [command(Default: all)]
         k8s='
@@ -103,11 +110,6 @@ unset flag_any_k8s
         [[ $1 ]] && _ps $1 || echo $k8s |xargs -n 1 /bin/bash -c '_ps "$@"' _ 
     }
 
-    set +a;set +o posix # Abide non-POSIX syntax
-    source <(kubectl completion bash)
-    # k and its completion
-    k(){ kubectl "$@"; }
-    complete -o default -F __start_kubectl k
 }
 
 [[ $(type -t minikube) ]] && {
@@ -136,7 +138,7 @@ unset flag_any_k8s
     flag_any_k8s=1
     set +a;set +o posix # Abide non-POSIX syntax 
     source <(sudo k3s completion bash)
-    k get svc -o jsonpath='{.}' 2>/dev/null || alias k='sudo k3s kubectl'
+    #k get svc -o jsonpath='{.}' 2>/dev/null || alias k='sudo k3s kubectl'
 }
 
 # Helm : Capture all dependencies of a chart
