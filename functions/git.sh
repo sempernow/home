@@ -29,7 +29,7 @@ gc(){ # commit -m [MSG]
     export -f newest
     [[ -d ./.git ]] || git init
     [[ "$@" ]] && _m="$@" || _m="$(newest)"
-    git add -u && git add && git commit -m "$_m" && gl
+    git add -u && git add . && git commit -m "$_m" && gl
     true
 }
 gch(){ # Checkout else create branch $1 else create branch HH.MM
