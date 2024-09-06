@@ -20,4 +20,8 @@
 [grep]
 	lineNumber = true
 [init]
-	defaultBranch = master
+    defaultBranch = master
+[http]
+	sslVerify = false
+[credential]
+	helper = cache
