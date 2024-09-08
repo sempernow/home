@@ -1,21 +1,24 @@
 #!/bin/bash
 
 # Simplest:
-# find . -type f ! -path '*/.git/*' -printf '%T+ %P\n' |sort -r |head -n 1 |cut -d' ' -f2-
-
-zzz_newest(){
+# find . -type f ! -path '*/.git/*' -printf '%T@ %P\n' |sort -r |head -n 1 |cut -d' ' -f2-
+# find . ! -path '*/.git/*' -type f -printf '%T@ %P\n ' -exec env TZ=UTC date -r {} +'%Y-%m-%dT%H:%MZ' \; |sort -r |head -1
+_newest_1(){
 
     [[ -d "$1" ]] && {
         
-        pushd "$1"
-        printf "%s" "$(find "$(pwd)" -type f ! -path '*/.git/*' -printf '%T+ %p\n' |sort -r |head -n 1 |cut -d' ' -f2-)"
-        popd
+        pushd "$1" >/dev/null 2>&1
+        #relpath="$(find "$(pwd)" ! -path '*/.git/*' -type f -printf '%T@ %P\n' |sort -r |cut -d' ' -f2- |head -n1)"
+        printf "%s" "$(find "$(pwd)" ! -path '*/.git/*' -type f -printf '%T@ %p\n' |sort -r |cut -d' ' -f2- |head -n1)"
+        #printf "%s @ %s" "$relpath" "$(env TZ=UTC date -r "$relpath" +'%Y-%m-%dT%H:%MZ')"
+        popd >/dev/null 2>&1
 
-        return
+        return 0
     }
+    [[ -f "$1" ]] && printf "%s" "$1"
 }
 
-_newest() {( 
+_newest_2() {( 
     # PARAMs: [ @ FNAME ] | [ ROOT-PATH [ -1(PWD-only) | t(prepend mtime) ] ] | (default @ $PWD) 
     # STDOUT: abs-path of newest FILE in $@ [full-depth]
 
@@ -55,6 +58,9 @@ _newest() {(
     return 0
 )}
 
-_newest "$@"
+#echo ''
+#_newest_1 "$@"
+#echo ''
+_newest_2 "$@"
 
 exit
