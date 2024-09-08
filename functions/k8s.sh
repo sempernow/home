@@ -14,7 +14,7 @@ unset flag_any_k8s
     containers(){ echo "$(sudo crictl ps |grep -v STATE |awk '{print $1}')"; }
     images(){ echo "$(sudo crictl images |grep -v STATE |awk '{print $1}')"; }
     set +a;set +o posix
-    source <(crictl completion)
+    #source <(sudo crictl completion)
 }
 
 [[ $(type -t cilium) ]] && {
@@ -135,12 +135,11 @@ unset flag_any_k8s
 }
 
 #[[ $(type -t k3s) ]] && sudo k3s kubectl get pod -o jsonpath='{.}' && {
-[[ $(type -t k3s) ]] && {
-    flag_any_k8s=1
-    set +a;set +o posix # Abide non-POSIX syntax 
-    source <(k3s completion bash)
-    #k get svc -o jsonpath='{.}' 2>/dev/null || alias k='sudo k3s kubectl'
-}
+#    flag_any_k8s=1
+#    set +a;set +o posix # Abide non-POSIX syntax 
+#    source <(sudo k3s completion bash)
+#    k get svc -o jsonpath='{.}' 2>/dev/null || alias k='sudo k3s kubectl'
+#}
 
 # Helm : Capture all dependencies of a chart
 # Save all Docker-image dependencies of a chart 
