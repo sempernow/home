@@ -14,7 +14,7 @@ unset flag_any_k8s
     containers(){ echo "$(sudo crictl ps |grep -v STATE |awk '{print $1}')"; }
     images(){ echo "$(sudo crictl images |grep -v STATE |awk '{print $1}')"; }
     set +a;set +o posix
-    source <(sudo crictl completion)
+    source <(crictl completion)
 }
 
 [[ $(type -t cilium) ]] && {
@@ -134,10 +134,11 @@ unset flag_any_k8s
     source <(minikube completion bash)
 }
 
-[[ $(type -t k3s) ]] && sudo k3s kubectl get pod -o jsonpath='{.}' && {
+#[[ $(type -t k3s) ]] && sudo k3s kubectl get pod -o jsonpath='{.}' && {
+[[ $(type -t k3s) ]] && {
     flag_any_k8s=1
     set +a;set +o posix # Abide non-POSIX syntax 
-    source <(sudo k3s completion bash)
+    source <(k3s completion bash)
     #k get svc -o jsonpath='{.}' 2>/dev/null || alias k='sudo k3s kubectl'
 }
 
@@ -205,3 +206,4 @@ unset flag_any_k8s
 
 [[ $flag_any_k8s ]] && [[ "$BASH_SOURCE" ]] && echo "@ $BASH_SOURCE"
 unset flag_any_k8s
+
