@@ -29,7 +29,7 @@ ll >/dev/null 2>&1 || alias ll='ls -AhlrtL --group-directories-first'
 
 alias df='df -hT'
 alias du='du -h'
-alias lsblk='lsblk -o SIZE,LABEL,NAME,MAJ:MIN,TYPE,FSTYPE,MOUNTPOINT,UUID'
+alias lsblk='lsblk -o SIZE,LABEL,NAME,GROUP,MAJ:MIN,TYPE,FSTYPE,MIN-IO,MOUNTPOINT,UUID'
 alias tree='tree -I vendor --dirsfirst'
 alias copy='cp -up'
 alias update='cp -urpv'
