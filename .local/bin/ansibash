@@ -27,7 +27,9 @@
 # For more information, please refer to <http://unlicense.org/>
 # -----------------------------------------------------------------------
 
-export ANSIBASH_VERSION='0.3.1 build 2024-07-18'
+export ANSIBASH_VERSION='0.4.1 build 2024-09-20'
+
+(return 0 2>/dev/null) && isSourced=1 || isSourced=0
 
 _ansibash(){
 
@@ -44,12 +46,13 @@ _ansibash(){
 			
 			  USAGE:
 
+			    ${0##*/} version
+			    ${0##*/} password [clear]
 			    ${0##*/} [-x] "command '\$local_arg1' 'local arg 2' '\\\$remote_arg'"
 			    ${0##*/} -c 'command1 args;command2 argX "\$remote_arg" && command3 argY'
 			    ${0##*/} -s "/path/to/local/script.sh arg1 '\$local_arg' '\\\$remote_arg'"
 			    ${0##*/} -u /path/to/local/source [/path/to/remote/parent (Default:~)]
 			    ${0##*/} -d /path/to/remote/source [/path/to/local/parent (Default:.)]
-			    ${0##*/} version
 		EOH
     }
     want(){
@@ -64,13 +67,14 @@ _ansibash(){
 		EOH
     }
     have(){
+        [[ $ANSIBASH_PW ]] && _ANSIBASH_PW='ANSIBASH_PW=<REDACTED>' || unset _ANSIBASH_PW
         #>>>  PRESERVE TABs of HEREDOC  <<<
 		cat <<-EOH
 
 		  ANSIBASH_TARGET_LIST='$ANSIBASH_TARGET_LIST'
 		  ANSIBASH_USER='$ANSIBASH_USER'
 		  ANSIBASH_VERBOSE='$ANSIBASH_VERBOSE'
-
+		  $_ANSIBASH_PW
 		EOH
     }
     ssh_user(){
@@ -81,8 +85,19 @@ _ansibash(){
         [[ $_ssh_user ]] && echo "$_ssh_user" || echo "$(id -un)"
     }
 
-    [[ $ANSIBASH_TARGET_LIST ]] || { usage;want;exit; }
-    [[ $@ ]] || { usage;have;exit; }
+    [[ "${1,,}" == 'password' ]] && {
+        (( isSourced )) || { echo "  USAGE: source ${0##*/} password [clear]";exit 0; }
+        [[ "${2,,}" == 'clear' ]] && { unset ANSIBASH_PW;return 0; }
+        read -s ANSIBASH_PW
+        export ANSIBASH_PW="$ANSIBASH_PW"
+        return 0
+    }
+
+    (( isSourced )) || {
+        [[ $ANSIBASH_TARGET_LIST ]] || { usage;want;exit; }
+        [[ $@ ]] || { usage;have;exit; }
+    }
+
     [[ "${1:0:1}" != '-' ]] && mode='-x' || { mode=$1;shift; }
     [[ $4 ]] && more='…' || unset more
     [[ "$mode" == '-s' ]] && { script=$1;shift; } || unset script
@@ -94,12 +109,19 @@ _ansibash(){
     do
         conn=$(ssh_user $host)@$host
         [[ $ANSIBASH_VERBOSE ]] && echo "=== $conn : $script $1 $2 $3 $more" || echo "=== $conn"
-        ssh $conn logger "ansibash : FROM: $(id -un)@$(hostname) TO: $conn"
-        [[ $mode == '-x' ]] && { ssh $conn "$@";continue; }
-        [[ $mode == '-c' ]] && { ssh $conn /bin/bash -c "$@" && continue || return $?; }
-        [[ $mode == '-s' ]] && {
-            [[ -r $script ]] || return 2
-            cat $script |ssh -T $conn /bin/bash -s - "$@" && continue || return $?
+        ssh $conn logger "ansibash : from $(id -un)@$(hostname) to $conn"
+        [[ $ANSIBASH_PW ]] && {
+            [[ $mode == '-x' ]] && { echo "$ANSIBASH_PW" |ssh -tt $conn "$@" |sed "s/$ANSIBASH_PW//";continue; }
+            [[ $mode == '-c' ]] && { echo ">>>  Method not implemented  <<<";return $?; }
+            [[ $mode == '-s' ]] && { echo ">>>  Method not implemented  <<<";return $?; }
+        }
+        [[ $ANSIBASH_PW ]] || {
+            [[ $mode == '-x' ]] && { ssh $conn "$@";continue; }
+            [[ $mode == '-c' ]] && { ssh $conn /bin/bash -c "$@" && continue || return $?; }
+            [[ $mode == '-s' ]] && {
+                [[ -r $script ]] || return 2
+                cat $script |ssh -T $conn /bin/bash -s - "$@" && continue || return $?
+            }
         }
         [[ $mode == '-u' ]] && { scp -pr "$1" $conn:$target && continue || return $?; }
         [[ $mode == '-d' ]] && { scp -pr "$conn:$1" "${2:-.}/${host}_${1##*/}" && continue || return $?; }
@@ -109,12 +131,12 @@ _ansibash(){
 
  [[ "$1" == 'version' ]] && {
     echo "  v$ANSIBASH_VERSION"
-    exit 0
+     (( isSourced )) || exit 0
  }
 
 _ansibash "$@"
 code=$?
 (( $code )) && echo  "ERROR: $code"
-exit $code
+(( isSourced )) || exit $code
 
 
