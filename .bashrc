@@ -72,10 +72,12 @@ trap 'set +a' RETURN
 # Set sudo visudo editor
 [[ $(type -t vi) ]] && VISUAL=$(which vi) && EDITOR=$(which vi)
 
+# Preserve USER environment @ sudo su
+[[ $HOME == /root ]] && home="$(pwd)" || home="$HOME"
 # User specific environment
-[[ -d $HOME/.local/bin ]] && {
-    [[ "$PATH" =~ "$HOME/.local/bin:$HOME/bin:" ]] ||
-        PATH="$HOME/.local/bin:$HOME/bin:$PATH"
+[[ -d $home/.local/bin ]] && {
+    [[ "$PATH" =~ "$home/.local/bin:$home/bin:" ]] ||
+        PATH="$home/.local/bin:$home/bin:$PATH"
 }
 
 # Configure to newest Golang version if any installed @ /usr/local/go[N.N.N]
@@ -94,7 +96,6 @@ HISTCONTROL=ignoreboth
     shopt -s histappend
     shopt -s checkwinsize
 }
-set +a
 
 # Umask
 #
@@ -104,17 +105,18 @@ set +a
 # Paranoid: neither group nor others have any perms:
 # umask 077
 # Source sibling configs unless already configured or configuring at all-users directory
+set +a
 [[ "$BASH_SOURCE" =~ "/etc/profile.d" ]] || {
-    [[ -f "${HOME}/.bash_aliases" ]]   && source "${HOME}/.bash_aliases"
-    [[ -f "${HOME}/.bash_functions" ]] && source "${HOME}/.bash_functions"
-    for file in $(find $HOME -maxdepth 1 -type f -iname '.bashrc_*');do
+    [[ -f "${home}/.bash_aliases" ]]   && source "${home}/.bash_aliases"
+    [[ -f "${home}/.bash_functions" ]] && source "${home}/.bash_functions"
+    for file in $(find $home -maxdepth 1 -type f -iname '.bashrc_*');do
         [[ -f "$file" ]] && source "$file"
     done
 }
 
 # End here if not interactive
 #[[ "$-" != *i* ]] && return 0
-[[ -z "$PS1" ]] && return 0 || set +a # End export all
+[[ -z "$PS1" ]] && { unset home;return 0; }
 
 # Programmable completion features
 # may already be enabled at /etc/bash.bashrc,
@@ -138,12 +140,13 @@ _completion_loader(){
 # Source git-prompt.sh, which exports all required by 
 # Git's conditional prompt function: __git_ps1. See PS1.
 [[ "$isBash" ]] && {
-    git_prompt="${HOME}/.git-prompt.sh"
+    git_prompt="${home}/.git-prompt.sh"
     [[ -f "$git_prompt" ]] && source $git_prompt || {
         git_prompt=/usr/share/git-core/contrib/completion/git-prompt.sh
         [[ -f "$git_prompt" ]] && source $git_prompt
     }
 }
+unset home
 
 #os="$(os |grep NAME |head -n1 |cut -d'=' -f2 |sed 's/"//g')"
 #ver="$(os |grep VERSION_ID |head -n1 |cut -d'=' -f2 |sed 's/"//g')"
@@ -212,3 +215,4 @@ PS1="$PS1"'\[\e[1;32m\] \w\[\e[0m\]'                                        # + 
 
 #[[ $BASH_SOURCE ]] && echo "@ ${BASH_SOURCE##*/}"
 [[ "$BASH_SOURCE" ]] && echo "@ $BASH_SOURCE"
+
