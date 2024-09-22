@@ -27,7 +27,7 @@
 # For more information, please refer to <http://unlicense.org/>
 # -----------------------------------------------------------------------
 
-export ANSIBASH_VERSION='0.4.2 build 2024-09-22'
+export ANSIBASH_VERSION='0.4.3 build 2024-09-22'
 
 (return 0 2>/dev/null) && isSourced=1 || isSourced=0
 
@@ -94,7 +94,7 @@ _ansibash(){
     }
 
     (( isSourced )) || {
-        [[ $ANSIBASH_PW ]] && _ANSIBASH_PW='ANSIBASH_PW=***' || unset _ANSIBASH_PW
+        [[ $ANSIBASH_PW ]] && _ANSIBASH_PW='ANSIBASH_PW=●●●' || unset _ANSIBASH_PW
         [[ $ANSIBASH_TARGET_LIST ]] || { usage;want;exit; }
         [[ $@ ]] || { usage;have;exit; }
     }
@@ -112,7 +112,7 @@ _ansibash(){
         [[ $ANSIBASH_VERBOSE ]] && echo "=== $conn : $script $1 $2 $3 $more" || echo "=== $conn"
         ssh $conn logger "ansibash : from $(id -un)@$(hostname) to $conn"
         [[ $ANSIBASH_PW ]] && {
-            [[ $mode == '-x' ]] && { echo "$ANSIBASH_PW" |ssh -tt $conn "$@" |sed "s/$ANSIBASH_PW//";continue; }
+            [[ $mode == '-x' ]] && { echo "$ANSIBASH_PW" |ssh -tt $conn "$@" |sed "s/$ANSIBASH_PW/●●●/";continue; }
             [[ $mode == '-c' ]] && { echo ">>>  Method not implemented  <<<";return $?; }
             [[ $mode == '-s' ]] && { echo ">>>  Method not implemented  <<<";return $?; }
         }
