@@ -81,7 +81,7 @@ trap 'set +a' RETURN
 }
 
 # Configure to newest Golang version if any installed @ /usr/local/go[N.N.N]
-GOROOT=$(find /usr/local -maxdepth 1 -type d -path '*/go*' |sort |tail -n 1)
+[[ -d /usr/local ]] && GOROOT=$(find /usr/local -maxdepth 1 -type d -path '*/go*' |sort |tail -n 1)
 [[ -d $GOROOT ]] && PATH=$GOROOT/bin:$PATH
 
 # History (history) Options

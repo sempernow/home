@@ -37,10 +37,10 @@ sync_bins_all(){
 }
 
 user(){
-    # Configure current user
-    find . -maxdepth 1 -type f -iname '.*' -exec cp -p {} ~/ \;
+    # Configure current user : UPDATEs ONLY
+    find . -maxdepth 1 -type f -iname '.*' -exec cp -up {} ~/ \;
     find functions -type f -iname '*.sh' -exec /bin/bash -c '
-        f=${1##*/};cp -p $1 ${0}/.bashrc_${f%%.*}
+        f=${1##*/};cp -up $1 ${0}/.bashrc_${f%%.*}
     ' $HOME {} \;
     [[ "$HAS_WSL" ]] || rm -f ~/.bashrc_win
     [[ "$IS_SUB" ]]  || rm -f ~/.bashrc_sub

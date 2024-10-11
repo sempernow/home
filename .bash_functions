@@ -155,15 +155,43 @@ journal(){ # -e : Jump to end, --no-pager : Show full message (truncated by defa
 #######
 # Other
 
+# Memory
+psrss(){ # RSS top ($1 else 12) or declared-command ($1) usage in MiB
+    e=-e
+    [[ "$1" =~ ^-?[0-9]+$ ]] && n=$1 || {
+        n=12;[[ $1 ]] && unset e 
+    }
+    ps -o pid,comm,rss,pmem,pcpu --sort=-rss \
+        |awk '{ printf "%-8s %-22s %s[MiB]   %5s %5s\n", $1, $2, $3, $4,$5}' |head -1
+    [[ $e ]] || ps -C $1 -o pid,comm,rss,pmem,pcpu --sort=-rss --no-headers \
+        |awk '{ printf "%-8s %-20s %6.0f       %5s %5s\n", $1, $2, $3/1024, $4, $5}' |head -$n
+    [[ $e ]] && ps $e -o pid,comm,rss,pmem,pcpu --sort=-rss --no-headers \
+        |awk '{ printf "%-8s %-20s %6.0f       %5s %5s\n", $1, $2, $3/1024, $4, $5}' |head -$n
+}
+meminfo(){
+    cat /proc/meminfo |awk '{ printf "%-16s %10.2f %4s\n", $1, $2/1024/1024,"GiB" }' |grep -v 0.00
+}
+alias mem=meminfo
+rss(){ # RSS per process
+    pid_of_cmd(){
+        [[ $1 ]] || return 1
+        ps -C $1 |grep $1 |awk '{print $1}'
+    }
+    pid=$(pid_of_cmd $1) && cat /proc/$pid/status \
+        |grep Vm |awk '{ printf "%-8s %5.0f %4s\n", $1, $2/1024,"MiB" }' |grep -v ' 0 '
+}
+
 # Current USER:GROUP
 ug(){ printf "$(id -u):$(id -g)"; }
+
 # Find all files hereunder containing pattern ($1)
 grepall(){ [[ "$1" ]] && find . -type f -exec grep -il "$1" "{}" \+ ; }
+
+# Crypto
 randa(){
     # ARGs: [LENGTH(Default:32]
     cat /dev/urandom |tr -dc 'a-zA-Z0-9' |fold -w ${1:-32} |head -n 1
 }
-
 md5()    {( algo=$FUNCNAME ; _hash "$@" ; )}
 sha()    {( algo=$FUNCNAME ; _hash "$@" ; )}
 sha1()   {( algo=$FUNCNAME ; _hash "$@" ; )}
@@ -273,14 +301,14 @@ tls(){
                 echo "  USAGE: $FUNCNAME cnf CN"
                 # ***  PRESERVE TABS of HEREDOC  ***
 				cat <<-EOH
-				
-				Set environment variable(s) to override their default:
-				
-				TLS_C=US
-				TLS_ST=NY
-				TLS_L=Gotham
-				TLS_O='Foo Inc'
-				TLS_OU=DevOps
+			
+				  Set environment variable(s) to override their default:
+			
+				  TLS_C=US
+				  TLS_ST=NY
+				  TLS_L=Gotham
+				  TLS_O='Foo Inc'
+				  TLS_OU=DevOps
 				EOH
 
                 return 0
@@ -333,15 +361,14 @@ tls(){
                             artifact=$3.csr
                             openssl req -new -newkey rsa:${5:-2048} -extensions req_ext -config $4 -noenc -keyout $3.key -out $3.csr
                         } || {
-                            echo "
-                                USAGE:
+                            echo '  USAGE:'
+							cat <<-EOH
+							    Make CSR using existing private key:
+							    $FUNCNAME csr make CN CNF_PATH PRIVATE_KEY_PATH [Key-length(Default:2048)]
 
-                                    Make CSR using existing private key:
-                                    $FUNCNAME csr make CN CNF_PATH PRIVATE_KEY_PATH [Key-length(Default:2048)]
-
-                                    Make CSR and private key:
-                                    $FUNCNAME csr make CN CNF_PATH [Key-length(Default:2048)]
-                            "
+						    Make CSR and private key:
+						    $FUNCNAME csr make CN CNF_PATH [Key-length(Default:2048)]
+							EOH
                             return 0
                         }
                     }
@@ -389,15 +416,18 @@ tls(){
             }
         ;;
         *)
-            echo ' USAGE:
-                tls key         : Make RSA private key file (.key)
-                tls cnf         : Make configuration file (.cnf) for CSR
-                tls csr make    : Make CSR file (.csr)
-                tls csr         : Verify CSR
-                tls crt parse   : Parse certificate
-                tls crt verify  : Verify certificate
-                tls server      : Get full-chain certificate of a server
-            '
+
+            echo '  USAGE: '
+            # ***  PRESERVE TABS of HEREDOC  ***
+			cat <<-EOH
+			    tls key         : Make RSA private key file (.key)
+			    tls cnf         : Make configuration file (.cnf) for CSR
+			    tls csr make    : Make CSR file (.csr)
+			    tls csr         : Verify CSR
+			    tls crt parse   : Parse certificate
+			    tls crt verify  : Verify certificate
+			    tls server      : Get full-chain certificate of a server
+			EOH
         ;;
     esac
     [[ -f $artifact ]] && printf "\n  %s\n" "See: $artifact"
@@ -427,7 +457,12 @@ hostfprs(){
 # Meta
 
 vars(){ declare -p |grep -E 'declare -(x|[a-z]*x)' |awk '{print $3}' |grep -v __git; }
-
+fx(){ declare -f; }
+declared(){
+    [[ $1 == 'v' ]] && vars
+    [[ $1 == 'f' ]] && fx
+    [[ $1 ]] || printf "  %s\n\n  %s\n" 'List all user-defined variables (v), or functions (f).' 'USAGE: declared v|f'
+}
 colors() {
     # Each is a background color and contrasting text color.
     # Usage: colors;printf "\n %s\n" "$green MESSAGE $norm"
