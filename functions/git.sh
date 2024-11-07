@@ -27,7 +27,6 @@ gc(){ # commit -m [MSG]
             |sort -r |head -n 1 |cut -d' ' -f2-
     }
     export -f newest
-    [[ -d ./.git ]] || git init
     [[ "$@" ]] && _m="$@" || _m="$(newest)"
     git add -u && git add . && git commit -m "$_m" && gl
     true
