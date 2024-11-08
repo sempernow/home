@@ -66,10 +66,10 @@ sync-user :
 sync-all :
 	bash make.recipes.sh sync_bins_all
 
-user : perms
+user : sync-user perms
 	bash make.recipes.sh user
 
-all : perms sync-all
+all : sync-all perms
 	bash make.recipes.sh all
 
 ubox :
@@ -93,9 +93,7 @@ makehtml :
 
 perms :
 	find . -type f ! -path './.git/*' -exec chmod 0644 "{}" \+
-	find . -type f ! -path './.git/*' -iname '*.sh' -exec chmod 0755 "{}" \+
-	chmod 0755 .local/bin/*
-	chmod 0644 functions/*.sh
+	chmod 0755 make.*.sh
 
 getgit :
 	wget https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh

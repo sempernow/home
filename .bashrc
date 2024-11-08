@@ -104,6 +104,7 @@ HISTCONTROL=ignoreboth
 # umask 027
 # Paranoid: neither group nor others have any perms:
 # umask 077
+
 # Source sibling configs unless already configured or configuring at all-users directory
 set +a
 [[ "$BASH_SOURCE" =~ "/etc/profile.d" ]] || {
@@ -112,6 +113,12 @@ set +a
     for file in $(find $home -maxdepth 1 -type f -iname '.bashrc_*');do
         [[ -f "$file" ]] && source "$file"
     done
+}
+
+[[ -d $HOME/.nvm ]] && {
+    export NVM_DIR="$HOME/.nvm"
+    [ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh"  # This loads nvm
+    [ -s "$NVM_DIR/bash_completion" ] && source "$NVM_DIR/bash_completion"
 }
 
 # End here if not interactive
@@ -215,4 +222,6 @@ PS1="$PS1"'\[\e[1;32m\] \w\[\e[0m\]'                                        # + 
 
 #[[ $BASH_SOURCE ]] && echo "@ ${BASH_SOURCE##*/}"
 [[ "$BASH_SOURCE" ]] && echo "@ $BASH_SOURCE"
+
+
 
