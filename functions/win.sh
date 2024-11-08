@@ -312,7 +312,7 @@ _PID_1xSHELL=$(ps |grep 'bash' |sort -k 7 |awk '{print $1;}' |head -n 1)
     ## This named-pipe scheme handles that, else warning text persists (@ STDOUT) regardless.
     set +o posix          # if syntax not POSIX, abide other
     mkfifo p1
-    wsl.exe -l -v >p1 &
+    wsl.exe -l -v >p1 & >/dev/null 2>&1
     [[ $(cat <p1 |tr -d '\000' |grep ${_OS} |awk '{print $NF}' |grep 2) ]] && {
         # Reset only at WSL 2 terminal
         #export DISPLAY='172.31.16.1:0.0'
