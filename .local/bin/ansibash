@@ -27,7 +27,7 @@
 # For more information, please refer to <http://unlicense.org/>
 # -----------------------------------------------------------------------
 
-export ANSIBASH_VERSION='0.4.5 build 2024-09-29'
+export ANSIBASH_VERSION='0.4.6 build 2024-10-13'
 
 (return 0 2>/dev/null) && isSourced=1 || isSourced=0
 
@@ -53,7 +53,7 @@ _ansibash(){
 			    ${0##*/} -s "/path/to/local/script.sh [ARGx ['\$local_arg' ['\\\$remote_arg']]...]"
 			    ${0##*/} -u /path/to/local/source [/path/to/remote/parent (Default:~)]
 			    ${0##*/} -d /path/to/remote/source [/path/to/local/parent (Default:.)]
-			    ${0##*/} sudopass [PASSWORD|clear (Default: <Interactive prompt>]           (For sudo only)
+			    source ${0##*/} sudopass [PASSWORD|clear (Default: <Interactive prompt>]    (For sudo only)
 			    ${0##*/} version
 		EOH
     }
@@ -114,7 +114,7 @@ _ansibash(){
     do
         conn=$(ssh_user $host)@$host
         [[ $ANSIBASH_VERBOSE ]] && echo "=== $conn : $script $1 $2 $3 $more" || echo "=== $conn"
-        ssh $conn logger "ansibash : from $(id -un)@$(hostname) to $conn"
+        ssh $conn logger "ansibash : BY $(id -un)@$(hostname) AS $conn"
         [[ $pw ]] && {
             [[ $mode == '-x' ]] && { echo "$pw" |ssh -tt $conn "$@" |sed "s/$pw/●●●/";continue; }
             [[ $mode == '-c' ]] && { echo ">>>  Method not implemented  <<<";return $?; }
