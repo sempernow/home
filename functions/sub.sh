@@ -1,7 +1,7 @@
 # source /etc/profile.d/sub.sh
-#####################################
-# Configure bash shell @ SUB subnet
-#####################################
+################################
+# Configure bash shell @ subnet
+################################
 
 return
 
@@ -76,3 +76,4 @@ wake(){ sudo killall -s SIGUSR1 automount && sudo mount -a; }
 }
 
 [[ "$BASH_SOURCE" ]] && echo "@ $BASH_SOURCE"
+

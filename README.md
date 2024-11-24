@@ -28,14 +28,15 @@ For `$USER`
 make user
 ```
 
-For all users
+For all users (don't)
 
 ```bash
 make all
 ```
+- Use only on your own host.
 
 If the environment lacks `make`, 
-then use [`make.recipes.sh`](make.recipes.sh):
+then run directly: [`make.recipes.sh`](make.recipes.sh):
 
 ```bash
 # For $USER
