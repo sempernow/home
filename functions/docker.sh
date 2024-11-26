@@ -2,7 +2,9 @@
 ##################################################
 # Configure bash shell for Docker
 ##################################################
-[[ $(type -t docker) ]] || return
+type -t docker || type -t podman || return
+type -t podman && alias docker=podman
+
 [[ "$isBashDockerSourced" ]] && return
 set -a # Export all
 trap 'set +a' RETURN
