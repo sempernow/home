@@ -35,9 +35,8 @@ export HAS_WSL        := $(shell type -t wsl.exe)
 
 menu :
 	$(INFO) 'Install'
-	@echo "sync      : Sync .local/bin of PWD with … (both)"
-	@echo "  *-user  : Sync with ${HOME}/.local/bin"
-	@echo "  *-all   : Sync with /usr/local/bin"
+	@echo "sync      : Sync with ${HOME}/.local/bin"
+	@echo "sync-all  : Sync with /usr/local/bin"
 	@echo "user      : Configure bash shell for current user (${USER})."
 	@echo "all       : Configure bash shell for all users."
 	
@@ -60,7 +59,7 @@ env :
 #	@echo "IS_SUB         : ${IS_SUB}"
 	@echo "HOME           : ${HOME}"
 
-sync synch : sync-user sync-all
+sync synch : sync-user
 sync-user :
 	bash make.recipes.sh sync_bins_user
 sync-all :
@@ -100,8 +99,8 @@ getgit :
 	wget https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash
 
 commit :
-	gc && gl
+	gc && gl && gs
 
 push :
-	gc && git push && gl
+	gc && git push && gl && gs
 

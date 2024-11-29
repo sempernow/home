@@ -27,7 +27,7 @@
 # For more information, please refer to <http://unlicense.org/>
 # -----------------------------------------------------------------------
 
-export ANSIBASH_VERSION='0.4.6 build 2024-10-13'
+export ANSIBASH_VERSION='0.4.7 build 2024-11-29'
 
 (return 0 2>/dev/null) && isSourced=1 || isSourced=0
 
@@ -88,7 +88,7 @@ _ansibash(){
 
     [[ "${1,,}" == 'sudopass' ]] && {
         (( isSourced )) || { echo "  USAGE: source ${0##*/} sudopass [clear]";exit 0; }
-        [[ $(type -t base64) ]] || { echo "  REQUIREs base64";return 0; }
+        type -t base64 >/dev/null 2>&1 || { echo "  REQUIREs base64";return 0; }
         [[ $2 ]] && [[ "${2,,}" == 'clear' ]] && { unset ANSIBASH_PW;return 0; }
         [[ $2 ]] && [[ "${2,,}" != 'clear' ]] && { export ANSIBASH_PW="$(echo "$2" |base64)";return 0; }
         read -p 'Enter sudo password: ' -s ANSIBASH_PW
