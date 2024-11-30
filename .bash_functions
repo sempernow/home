@@ -11,7 +11,8 @@ set -a # Export all
 trap 'set +a' RETURN
 #isBashFunctionsSourced=1
 
-[[ "$_PID_1xSHELL" ]] || _PID_1xSHELL=$(ps |grep 'bash' |sort -k 7 |awk '{print $1;}' |head -n 1)
+[[ "$_PID_1xSHELL" ]] ||
+    _PID_1xSHELL=$(ps |grep 'bash' |sort -k 7 |awk '{print $1;}' |head -n 1)
 
 ######
 # Date
@@ -154,6 +155,14 @@ journal(){ # -e : Jump to end, --no-pager : Show full message (truncated by defa
 
 #######
 # Other
+
+# Cgroup driver
+cgroup(){
+    fs=$(stat -fc %T /sys/fs/cgroup/)
+    [[ $fs == 'tmpfs' ]] && printf v1 && return
+    [[ $fs == 'cgroup2fs' ]] && printf v2 && return
+    echo unknown
+}
 
 # Memory
 psrss(){ # RSS top ($1 else 12) or declared-command ($1) usage in MiB
