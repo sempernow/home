@@ -48,7 +48,7 @@ menu :
 	
 	$(INFO) 'Meta'
 	@echo "html      : Process markdown (.md) into markup (.html)"
-	@echo "perms     : find . -type f … -exec chmod …"
+	@echo "mode      : find . -type f … -exec chmod …"
 	@echo "commit    : git commit … && git log …"
 	@echo "push      : git commit … && git push … && git log …"
 
@@ -90,7 +90,7 @@ md2html : makehtml perms
 makehtml :
 	find . -type f -iname '*.md' -exec md2html.exe "{}" \;
 
-perms :
+mode perms :
 	find . -type f ! -path './.git/*' -exec chmod 0644 "{}" \+
 	chmod 0755 make.*.sh
 

@@ -23,7 +23,7 @@ gbd(){
 }
 gc(){ # commit -m [MSG]
     newest(){
-        TZ=Zulu find . -type f ! -path '*/.git/*' -printf '%T+ %P @ %TY-%Tm-%TdT%TH:%TMZ\n' \
+        TZ=Zulu find . -type f ! -path '*/.git/*' ! -iname '*.log' -printf '%T+ %P @ %TY-%Tm-%TdT%TH:%TMZ\n' \
             |sort -r |head -n 1 |cut -d' ' -f2-
     }
     export -f newest
