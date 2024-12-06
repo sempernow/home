@@ -88,13 +88,13 @@ unset flag_any_k8s
     }
 
     psk(){
-        # ps aux; all k8s-related processes. 
+        # Print entire command statement of k8s process(es).
         # ARGs: [command(Default: all)]
         k8s='
             containerd
             dockerd
             etcd
-            kubelet 
+            kubelet
             kube-apiserver
             kube-controller-manager
             kube-scheduler
@@ -102,12 +102,12 @@ unset flag_any_k8s
         '
         _ps(){
             [[ "$1" ]] || exit 1
-            echo @ $1 
-            ps aux |grep -- "$1 " |tr ' ' '\n' \
+            echo @ $1
+            ps -ax -o command |grep -- "$1 " |tr ' ' '\n' \
                 |grep -- -- |grep -v color |grep -v grep
         }
         export -f _ps
-        [[ $1 ]] && _ps $1 || echo $k8s |xargs -n 1 /bin/bash -c '_ps "$@"' _ 
+        [[ $1 ]] && _ps $1 || echo $k8s |xargs -n 1 /bin/bash -c '_ps "$@"' _
     }
 
 }
