@@ -165,6 +165,7 @@ cgroup(){
 }
 
 # Memory
+topr(){ top -emEms -oRES; }
 psrss(){ # RSS top ($1 else 12) or declared-command ($1) usage in MiB
     e=-e
     [[ "$1" =~ ^-?[0-9]+$ ]] && n=$1 || {
@@ -178,7 +179,7 @@ psrss(){ # RSS top ($1 else 12) or declared-command ($1) usage in MiB
         |awk '{ printf "%-8s %-20s %6.0f       %5s %5s\n", $1, $2, $3/1024, $4, $5}' |head -$n
 }
 meminfo(){
-    cat /proc/meminfo |awk '{ printf "%-16s %10.2f %4s\n", $1, $2/1024/1024,"GiB" }' |grep -v 0.00
+    cat /proc/meminfo |awk '{ printf "%-16s %10.0f %4s\n", $1, $2/1024,"MiB" }' |grep -v ' 0' 
 }
 alias mem=meminfo
 rss(){ # RSS per process

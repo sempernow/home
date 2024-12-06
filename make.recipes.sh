@@ -6,7 +6,7 @@
 #######################################################################
 
 sync_bins_user(){
-    # Sync scripts of .local/bin/ with ~/.local/bin and ~/.bin
+    # Sync .local/bin/ with ~/.local/bin and ~/.bin
     [[ -d .local/bin ]] || return 0
     chmod 0755 .local/bin/*
     find .local/bin -type f -exec /bin/bash -c '
@@ -23,9 +23,11 @@ sync_bins_user(){
 }
 
 sync_bins_all(){
-    # Sync scripts of .local/bin/ with /usr/local/bin
+    # Sync .local/bin/ with /usr/local/bin
     [[ -d .local/bin ]] || return 0
-    [[ -d /usr/local/bin ]] || return 0
+    [[ -d /usr/local/bin ]] ||
+        sudo mkdir -p /usr/local/bin &&
+            sudo chown 0:0 /usr/local/bin
     sudo chmod 0755 .local/bin/*
     find .local/bin -type f -exec /bin/bash -c '
         sudo cp -up $1 /usr/local/bin/
