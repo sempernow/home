@@ -13,6 +13,18 @@ trap 'set +a' RETURN
 #isBashGitSourced=1
 
 alias gcfg='git config -l'
+gi(){
+    br=${1:-master}
+    [[ -d .git ]] && return 1
+    acct=$(git config user.account)
+    [[ $acct ]] || return 2
+    repo=$(pwd);repo=${repo##*/}
+    git init
+    git branch -M $br
+    git remote add origin github.com:/$acct/$repo.git
+    gc
+    git push -u origin $br
+}
 ga(){ git add . ; git status; }
 gb(){ git branch --all;echo;git remote -v; }
 gbd(){
