@@ -6,6 +6,10 @@
 #isBashK8sSourced=1
 unset flag_any_k8s
 
+[[ $(type -t ctr) ]] && {
+    ctr(){ command ctr -n k8s.io "$@"; }
+    export -f ctr
+}
 
 [[ $(type -t crictl) ]] && {
     flag_any_k8s=1
