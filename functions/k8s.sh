@@ -45,15 +45,9 @@ unset flag_any_k8s
 
     # Get/Set kubectl namespace : USAGE: kn [NAMESPACE]
     kn() { 
-        [[ $1 ]] && {
-            kubectl config set-context --current --namespace $1
-        } || {
-            [[ $(type -t yq) ]] && {
-                kubectl config view --minify |yq .contexts[].context.namespace
-            } || {
-                kubectl config view --minify |grep namespace |cut -d" " -f6
-            }
-        }
+        [[ $1 ]] &&
+            kubectl config set-context --current --namespace $1 ||
+                kubectl config view |command grep namespace |awk '{printf $2}'
     }
 
     # Get/Set kubectl context : USAGE: kx [CONTEXT_NAME]
@@ -81,14 +75,15 @@ unset flag_any_k8s
         kubectl get sc
     }
 
-    # Get all workloads/nodes of current namespace
+    # Get workloads per node
     kw(){
-        [[ $(type -t yq) ]] && {
-            nodes="$(k get node -o yaml |yq .items[].metadata.name)"
-        } || {
-            nodes="$(k get node -o yaml |grep ' name: ' |cut -d':' -f2)"
-        }
-        printf "%s\n" "$nodes" |xargs -IX /bin/bash -c 'k get pod -o wide |grep $1' _ X
+        kubectl get nodes -o jsonpath='{.items[*].metadata.name}' \
+            |xargs printf "%s\n" \
+            |xargs -IX /bin/bash -c '
+                echo === $1 : $(k get pod -o wide |grep $1 |wc -l)/$(k get pod -A -o wide |grep $1 |wc -l) 
+                kubectl get pod -o wide |grep $1
+            ' _ X
+            printf "\n%s\n" "$(k get pod |grep -v NAME |wc -l)/$(k get pod -A |grep -v NAME |wc -l) @ $(kn)"
     }
 
     psk(){
