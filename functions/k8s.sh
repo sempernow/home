@@ -44,10 +44,18 @@ unset flag_any_k8s
     }
 
     # Get/Set kubectl namespace : USAGE: kn [NAMESPACE]
-    kn() {
-        all(){ kubectl get ns --no-headers |cut -d' ' -f1; }
-        [[ $1 ]] && [[ $(all |grep $1) ]] && kubectl config set-context --current --namespace $1 && kn || {
-            ns=$(kubectl config view |command grep namespace |awk '{printf $2}')
+    kn (){
+        all(){ kubectl get ns --no-headers | cut -d' ' -f1; }
+        [[ -n $1 ]] && {
+            [[ -n $(all |grep $1) ]] &&
+                kubectl config set-context --current --namespace $1 &&
+                    kn
+        }
+        [[ -n $1 ]] || {
+            ctx="$(kubectl config view -o jsonpath='{.current-context}')"
+            [[ -n $ctx ]] || return 11
+            ns="$(kubectl config view -o jsonpath='{.contexts[?(@.name=="'$ctx'")].context.namespace}')"
+            [[ -n $ns ]] || return 12
             all |command grep --color $ns
             all |command grep -v $ns
         }
