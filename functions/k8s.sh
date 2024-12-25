@@ -94,7 +94,7 @@ unset flag_any_k8s
                 echo === $1 : $(k get pod -o wide |grep $1 |wc -l)/$(k get pod -A -o wide |grep $1 |wc -l) 
                 kubectl get pod -o wide |grep $1
             ' _ X
-            printf "\n%s\n" "$(k get pod |grep -v NAME |wc -l)/$(k get pod -A |grep -v NAME |wc -l) @ $(kn)"
+            printf "\n%s\n" "$(k get pod |grep -v NAME |wc -l)/$(k get pod -A |grep -v NAME |wc -l) @ $(kn |head -n1)"
     }
 
     psk(){
