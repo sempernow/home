@@ -27,7 +27,7 @@
 # For more information, please refer to <http://unlicense.org/>
 # -----------------------------------------------------------------------
 
-export ANSIBASH_VERSION='0.4.7 build 2024-11-29'
+export ANSIBASH_VERSION='0.4.7 build 2024-12-31'
 
 (return 0 2>/dev/null) && isSourced=1 || isSourced=0
 
@@ -44,7 +44,7 @@ _ansibash(){
 			  via SSH tunnel as user configured in ~/.ssh/config else declared.
 
 			  Effectively a faster, simpler, small subset of Ansible's functionality
-			  requiring no configuration nor new syntax beyond Bash.
+			  requiring nearly no configuration and no syntax beyond Bash.
 
 			  USAGE:
 
