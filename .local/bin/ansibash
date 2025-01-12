@@ -27,7 +27,7 @@
 # For more information, please refer to <http://unlicense.org/>
 # -----------------------------------------------------------------------
 
-export ANSIBASH_VERSION='0.4.7 build 2024-12-31'
+export ANSIBASH_VERSION='0.4.8 build 2025-01-12'
 
 (return 0 2>/dev/null) && isSourced=1 || isSourced=0
 
@@ -134,10 +134,10 @@ _ansibash(){
     done
 }
 
- [[ "$1" == 'version' ]] && {
+[[ "$1" == 'version' ]] && {
     echo "  v$ANSIBASH_VERSION"
-     (( isSourced )) || exit 0
- }
+    (( isSourced )) && return 0 || exit 0
+}
 
 _ansibash "$@"
 code=$?
