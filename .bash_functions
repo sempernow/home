@@ -20,6 +20,7 @@ trap 'set +a' RETURN
 # For EST (UTC-05:00) that ignores Daylight Savings Time (UTC-04:00):
 #TZ='America/New_York'
 
+nist(){ cat </dev/tcp/time.nist.gov/13; }
 today(){
     # YYY-MM-DD
     t="$(date '+%F')";echo "$t"
