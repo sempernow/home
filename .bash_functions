@@ -419,7 +419,7 @@ tls(){
             [[ $2 == "parse" ]] && {
                 [[ -f $3 ]] && {
                     artifact=/tmp/tls.crt.parse.${3##*/}.log
-                    openssl x509 -in $3 -text -noout | tee $artifact 
+                    openssl x509 -in $3 -noout -issuer -subject -startdate -enddate -ext subjectAltName |tee $artifact 
                 } || {
                     echo "  USAGE: $FUNCNAME crt parse SERVER_CERT"
                     return 0
