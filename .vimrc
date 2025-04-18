@@ -36,7 +36,7 @@ endfunction
 
 function! List()
   set list                               " List (show) control chars TAB and SPACE
-  set listchars=tab:▸\ ,space:·,trail:•  " TAB as '▸    ' (U+25b8), SPACE as '·' (U+00b7), traling SPACE as '•' (U+2022)
+  set listchars=tab:▸\ ,space:·,trail:•,eol:¶  " TAB as '▸    ' (U+25b8), SPACE as '·' (U+00b7), traling SPACE as '•' (U+2022)
 endfunction
 
 function! Nolist()
@@ -75,3 +75,6 @@ filetype plugin indent on
 " YAML untested:
 " autocmd FileType yaml setlocal ai ts=2 sw=2 et
 
+" Reveal Windows line endings 
+set fileformat=unix
+set fileformats=unix
