@@ -43,9 +43,10 @@ function! Nolist()
   set nolist
 endfunction
 
-call Spaces()
-call List()
+call Yaml()
+"call List()
 
+set smartindent
 set clipboard=unnamed           " Set clipboard to unnamed to access system clipboard @ Windows
 set noswapfile                  " Prevent vim's zombie swap-file clusterfuck
 set ignorecase                  " Case insensitive search
