@@ -25,15 +25,16 @@ sync_bins_user(){
 sync_bins_all(){
     # Sync .local/bin/ with /usr/local/bin
     [[ -d .local/bin ]] || return 0
+    [[ $(whoami) == root ]] && unset su || su=sudo  
     [[ -d /usr/local/bin ]] ||
-        sudo mkdir -p /usr/local/bin &&
-            sudo chown 0:0 /usr/local/bin
-    sudo chmod 0755 .local/bin/*
-    find .local/bin -type f -exec /bin/bash -c '
-        sudo cp -up $1 /usr/local/bin/
-        sudo cp -up /usr/local/bin/${1##*/} .local/bin/
-        sudo chown root:root /usr/local/bin/${1##*/}
-        sudo chown $(id -u):$(id -g) .local/bin/*
+        $su mkdir -p /usr/local/bin &&
+            $su chown 0:0 /usr/local/bin
+    $su chmod 0755 .local/bin/*
+    $su find .local/bin -type f -exec /bin/bash -c '
+        cp -up $1 /usr/local/bin/
+        cp -up /usr/local/bin/${1##*/} .local/bin/
+        chown root:root /usr/local/bin/${1##*/}
+        [[ $su ]] && chown $(id -u):$(id -g) .local/bin/*
     ' _ {} \;
     return 0
 }
